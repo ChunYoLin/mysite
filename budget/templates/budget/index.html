@@ -1,53 +1,86 @@
 <!doctype html>
 <html>
 	<head>
+		{% load staticfiles %}
+		<link rel="stylesheet" href='{% static 'budget/css/index.css' %}' type="text/css">
 		<title>Budget</title>
 		<meta charset='utf-8'>
 	</head>
 	<body>
-		{% for budget in Budget %}
-			<h1>{{ budget.Budget_name }}</h1>
-			<table>
-				<tr>
-					<th>項目</th>
-					<th>預算</th>
-				</tr>
-			{% for item in budget.item_set.all %}
-				<tr>
-					<td>{{ item.Item_name }}</td>
-					<td>{{ item.Value }}</td>
-					<td>
-						<form action="delete_item" method="get" >
-							<input type="hidden" name="Item_id" value={{item.id}}>
-							<input type="submit" value="delete">
-						</form>
-					</td>
-				</tr>
-			{% endfor%}
-				<tr>
-					<td>總和</td>
-					<td id="id1"></td>
-					<script>
-						var x = 0;
-						{% for item in budget.item_set.all %}
-							x += {{ item.Value }};
-						{% endfor %}
-						document.getElementById("id1").innerHTML = x;
-					</script>
-				</tr>
-			</table>
-			<form action="add_item" method="get" >
-				<input type="hidden" name="Budget_name" value={{budget.Budget_name}}>
+		<div style="float:left">
+		{% if Budget %}
+			{% for budget in Budget %}
+				<h1>{{ budget.name }}</h1>
+				<table>
+					<tr>
+						<th>項目</th>
+						<th>預算</th>
+						<th>剩餘</th>
+					</tr>
+				{% for item in budget.item_set.all %}
+					<tr>
+						<td>{{ item.name }}</td>
+						<td>{{ item.value }}</td>
+						<td>{{ item.remain }}</td>
+						<td>
+							<form action="delete_item" method="get" >
+								<input type="hidden" name="Item_id" value={{item.id}}>
+								<input type="submit" value="delete">
+							</form>
+						</td>
+					</tr>
+				{% endfor%}
+					<tr>
+						<td>總和</td>
+						<td id="total_budget"></td>
+						<script>
+							var x = 0;
+							{% for item in budget.item_set.all %}
+								x += {{ item.value }};
+							{% endfor %}
+							document.getElementById("total_budget").innerHTML = x;
+						</script>
+					</tr>
+				</table>
+				<form action="add_item" method="get" >
+					<input type="hidden" name="Budget_name" value={{budget.name}}>
 
-				<label for="Item_name">name</label>
-					<input type="text" name="Item_name">
-				<label for="Value">value</label>
-					<input type="number" name="Value">
-				<label for="Description">description</label>
-					<input type="text" name="Description">
+					<label for="Item_name">name</label>
+						<input type="text" name="Item_name">
+					<label for="value">value</label>
+						<input type="number" name="value">
 
-				<input type="submit" value="add item">
-			</form>
-		{% endfor %}
+					<input type="submit" value="add item">
+				</form>
+			{% endfor %}
+		{% endif %}
+		</div>
+		<div style="float:right">
+			{% if Bank%}
+				<table>
+					<tr>
+						<th>銀行</th>
+						<th>剩餘</th>
+					</tr>
+				{% for bank in Bank %}
+					<tr>
+						<td>{{ bank.name }}</td>
+						<td>{{ bank.value }}</td>
+					</tr>
+				{% endfor %}
+						<tr>
+							<td>總和</td>
+							<td id="total_bank"></td>
+							<script>
+								var x = 0;
+								{% for bank in Bank %}
+									x += {{ bank.value }};
+								{% endfor %}
+								document.getElementById("total_bank").innerHTML = x;
+							</script>
+						</tr>
+				</table>
+			{% endif %}
+		</div>
 	</body>
 </html>
