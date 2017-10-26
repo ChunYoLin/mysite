@@ -1,63 +1,69 @@
 <!doctype html>
 <html>
 	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 		{% load staticfiles %}
 		<link rel="stylesheet" href='{% static 'budget/css/index.css' %}' type="text/css">
 		<title>Budget</title>
 		<meta charset='utf-8'>
 	</head>
 	<body>
-		<div style="float:left">
-		{% if Budget %}
-			{% for budget in Budget %}
-				<h1>{{ budget.name }}</h1>
-				<table>
-					<tr>
-						<th>項目</th>
-						<th>預算</th>
-						<th>剩餘</th>
-					</tr>
-				{% for item in budget.item_set.all %}
-					<tr>
-						<td>{{ item.name }}</td>
-						<td>{{ item.value }}</td>
-						<td>{{ item.remain }}</td>
-						<td>
-							<form action="delete_item" method="get" >
-								<input type="hidden" name="Item_id" value={{item.id}}>
-								<input type="submit" value="delete">
-							</form>
-						</td>
-					</tr>
-				{% endfor%}
-					<tr>
-						<td>總和</td>
-						<td id="total_budget"></td>
-						<script>
-							var x = 0;
-							{% for item in budget.item_set.all %}
-								x += {{ item.value }};
-							{% endfor %}
-							document.getElementById("total_budget").innerHTML = x;
-						</script>
-					</tr>
-				</table>
-				<form action="add_item" method="get" >
-					<input type="hidden" name="Budget_name" value={{budget.name}}>
+		<div id="DIV_BUDGET">
+			<h1>{{ Budget.name }}</h1>
+			<table border=1>
+				<tr>
+					<th>項目</th>
+					<th>預算</th>
+					<th>剩餘</th>
+				</tr>
+			{% for item in Budget.item_set.all %}
+				<tr>
+					<td>{{ item.name }}</td>
+					<td>{{ item.value }}</td>
+					<td>{{ item.remain }}</td>
+					<td>
+						<form action="delete_item" method="get" >
+							<input type="hidden" name="Item_id" value={{item.id}}>
+							<input type="submit" value="delete">
+						</form>
+					</td>
+				</tr>
+			{% endfor%}
+				<tr>
+					<td>總和</td>
+					<td id="total_budget"></td>
+					<script>
+						var x = 0;
+						{% for item in Budget.item_set.all %}
+							x += {{ item.value }};
+						{% endfor %}
+						document.getElementById("total_budget").innerHTML = x;
+					</script>
+				</tr>
+			<form action="add_item" method="get" >
+				<input type="hidden" name="Budget_name" value={{Budget.name}}>
 
-					<label for="Item_name">name</label>
-						<input type="text" name="Item_name">
-					<label for="value">value</label>
-						<input type="number" name="value">
+				<tr>
+					<!-- <label for="Item_name">name</label> -->
+					<td>
+						<input type="text" name="Item_name" style="width: 8em;">
+					</td>
+					<!-- <label for="value">value</label> -->
+					<td>
+						<input type="number" name="value" style="width: 3em;">
+					</td>
 
-					<input type="submit" value="add item">
-				</form>
-			{% endfor %}
-		{% endif %}
+					<td>
+						<input type="submit" value="add item">
+					</td>
+				</tr>
+			</form>
+			</table>
 		</div>
-		<div style="float:right">
+		<div id="DIV_ASSET">
+			<h1> 資產 </h1>
 			{% if Bank%}
-				<table>
+				<table border=1>
 					<tr>
 						<th>銀行</th>
 						<th>剩餘</th>
@@ -81,6 +87,68 @@
 						</tr>
 				</table>
 			{% endif %}
+		</div>
+		<div id="DIV_TRANSACTIONS">
+			<h1> 收支紀錄 </h1>
+			<table border=1>
+				<tr>
+					<th> 名稱 </th>
+					<th> 金額 </th>
+					<th> 日期 </th>
+					<th> 所屬資產 </th>
+					<th> 所屬預算 </th>
+				</tr>
+				
+				{% for transaction in Transactions %}
+					<tr>
+						<td>{{ transaction.name }}</td>
+						<td>{{ transaction.value }}</td>
+						<td>{{ transaction.date }}</td>
+						<td>{{ transaction.bank }}</td>
+						<td>{{ transaction.item }}</td>
+					</tr>
+				{% endfor %}
+				<form action="add_transactions" method="get" >
+					<tr>
+						<td>
+							<input type="text" name="name" style="width: 8em;">
+						</td>
+						<td>
+							<input type="text" name="value" style="width: 8em;">
+						</td>
+						<td>
+							<input type="date" name="date" style="width: 10em; height: 1.8em" id=theDate>
+							<script>
+								var date = new Date();
+								var day = date.getDate();
+								var month = date.getMonth() + 1;
+								var year = date.getFullYear();
+								if (month < 10) month = "0" + month;
+								if (day < 10) day = "0" + day;
+								var today = year + "-" + month + "-" + day;       
+								document.getElementById("theDate").value = today;
+							</script>
+						</td>
+						<td>
+							<select name="Bank_name">
+								{% for bank in Bank %}
+									<option>{{ bank.name }}</option>
+								{% endfor %}
+							</select>
+						</td>
+						<td>
+							<select name="Item_name">
+								{% for item in Budget.item_set.all %}
+									<option>{{ item.name }}</option>
+								{% endfor %}
+							</select>
+						</td>
+						<td>
+							<input type="submit" value="新增">
+						</td>
+					</tr>
+				</form>
+			</table>
 		</div>
 	</body>
 </html>

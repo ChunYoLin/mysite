@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 # Create your models here.
 
@@ -38,12 +39,12 @@ class Investment(models.Model):
 class Transactions(models.Model):
     name = models.CharField(max_length=100)
     value = models.IntegerField(default=0)
+    date = models.DateField(default=timezone.now())
     
     bank = models.ForeignKey(
         'Bank',
         on_delete=models.CASCADE,
     )
-
     item = models.ForeignKey(
         'Item',
         on_delete=models.CASCADE,
