@@ -7,12 +7,15 @@ from .models import Budget, Item, Bank, Investment, Incomes, Expenses
 # Create your views here.
 class IndexView(generic.ListView):
 
+    model = Budget
     template_name = 'budget/index.html'
-    context_object_name = 'Budget'
 
-    def get_queryset(self):
+    def get_context_data(self, **kwargs):
         
-        return Budget.objects.all()
+        context = super(IndexView, self).get_context_data(**kwargs)
+        context["Budget"] = Budget.objects.all()
+        context["Bank"] = Bank.objects.all()
+        return context 
     
 class DetailView(generic.DetailView):
 
@@ -20,11 +23,11 @@ class DetailView(generic.DetailView):
     template_name = 'budget/detail.html'
 
     def get_context_data(self, **kwargs):
-        B = kwargs['object']
+        budget = kwargs['object']
         context = super(DetailView, self).get_context_data(**kwargs)
         context["Bank"] = Bank.objects.all()
-        context["Incomes"] = B.incomes_set.all()
-        context["Expenses"] = B.expenses_set.all()
+        context["Incomes"] = budget.incomes_set.all()
+        context["Expenses"] = budget.expenses_set.all()
         
         return context
     
@@ -80,3 +83,24 @@ def add_expense(request, Budget_id):
     expense = Expenses(name=name, value=value, date=date, bank=bank, item=item, budget=budget)
     expense.save() 
     return HttpResponseRedirect('/budget/{}/'.format(Budget_id)) 
+
+def asset_transfer(request):
+    
+    try:
+        bank_src_name = request.POST["bank_src"]
+        value = int(request.POST["value"])
+        bank_dst_name = request.POST["bank_dst"]
+    except ValueError:
+        return HttpResponseRedirect('/budget/') 
+
+    bank_src = Bank.objects.get(name=bank_src_name)
+    bank_dst = Bank.objects.get(name=bank_dst_name)
+    if bank_src.value < value or value < 0:
+        pass
+    else:
+        bank_src.value -= value
+        bank_src.save()
+        bank_dst.value += value
+        bank_dst.save()
+    return HttpResponseRedirect('/budget/') 
+    

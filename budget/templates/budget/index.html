@@ -1,3 +1,69 @@
-{% for budget in Budget %}
-	<li><a href="/budget/{{budget.id}}">{{ budget }}</a></li>
-{% endfor %}
+{% extends 'budget/base.html' %}
+
+{% block budget %}
+	{% for budget in Budget %}
+		<li><a href="/budget/{{budget.id}}">{{ budget }}</a></li>
+	{% endfor %}
+{% endblock %}
+
+{% block asset %}
+	<h1> 資產 </h1>
+	{% if Bank%}
+		<table border=1>
+			<tr>
+				<th>銀行</th>
+				<th>剩餘</th>
+			</tr>
+		{% for bank in Bank %}
+			<tr>
+				<td>{{ bank.name }}</td>
+				<td>{{ bank.value }}</td>
+			</tr>
+		{% endfor %}
+				<tr>
+					<td>總和</td>
+					<td id="total_bank"></td>
+					<script>
+						var x = 0;
+						{% for bank in Bank %}
+							x += {{ bank.value }};
+						{% endfor %}
+						document.getElementById("total_bank").innerHTML = x;
+					</script>
+				</tr>
+		</table>
+	{% endif %}
+{% endblock %}
+
+{% block asset_transfer %}
+	<form action="asset_transfer" method="post" >
+		<h1>資產轉移</h1>
+		<table border=1>
+			<tr>
+				<td>
+					從
+					<select name="bank_src">
+						{% for bank in Bank %}
+							<option>{{ bank.name }}</option>
+						{% endfor %}
+					</select>
+				</td>
+				<td>
+					轉
+					<input type='number' name='value' style='width:5em;'></input>
+				</td>
+				<td>
+					到
+					<select name="bank_dst">
+						{% for bank in Bank %}
+							<option>{{ bank.name }}</option>
+						{% endfor %}
+					</select>
+				</td>
+				<td>
+					<input type="submit" value="新增">
+				</td>
+			</tr>
+		</table>
+	</form>
+{% endblock %}

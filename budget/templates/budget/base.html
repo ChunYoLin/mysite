@@ -1,0 +1,22 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+		{% load staticfiles %}
+		<link rel="stylesheet" href='{% static 'budget/css/index.css' %}?{% now "U" %}' type="text/css">
+		<title>{{ budget.name }}</title>
+		<meta charset='utf-8'>
+	</head>
+
+	<div id="DIV_BUDGETS">
+		{% block budget %}
+		{% endblock %}
+	</div>
+	<div id="DIV_ASSET">
+		{% block asset %}
+		{% endblock %}
+	</div>
+	<div id="DIV_ASSET_TRANSFER">
+		{% block asset_transfer %}
+		{% endblock %}
+	</div>	
+</html>

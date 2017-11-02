@@ -2,12 +2,13 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-		{% load staticfiles %}
-		<link rel="stylesheet" href='{% static 'budget/css/index.css' %}' type="text/css">
 		<title>{{ budget.name }}</title>
 		<meta charset='utf-8'>
 	</head>
 	<body>
+		<div>
+			<a href="/budget/">首頁</a>
+		</div>
 		<div id="DIV_BUDGET">
 			<h1>{{ budget.name }}份預算表</h1>
 			<table border=1>
@@ -59,34 +60,6 @@
 				</tr>
 			</form>
 			</table>
-		</div>
-		<div id="DIV_ASSET">
-			<h1> 資產 </h1>
-			{% if Bank%}
-				<table border=1>
-					<tr>
-						<th>銀行</th>
-						<th>剩餘</th>
-					</tr>
-				{% for bank in Bank %}
-					<tr>
-						<td>{{ bank.name }}</td>
-						<td>{{ bank.value }}</td>
-					</tr>
-				{% endfor %}
-						<tr>
-							<td>總和</td>
-							<td id="total_bank"></td>
-							<script>
-								var x = 0;
-								{% for bank in Bank %}
-									x += {{ bank.value }};
-								{% endfor %}
-								document.getElementById("total_bank").innerHTML = x;
-							</script>
-						</tr>
-				</table>
-			{% endif %}
 		</div>
 		<div id="DIV_INCOME">
 			<h1> 收入 </h1>
