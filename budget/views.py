@@ -3,7 +3,7 @@ from django.views import generic
 from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse
 
-from .models import Budget, Item, Bank, Investment, Incomes, Expenses
+from .models import *
 # Create your views here.
 class IndexView(generic.ListView):
 
@@ -31,16 +31,15 @@ class DetailView(generic.DetailView):
         
         return context
     
-    def add_item(self, pk):
+    def add_debt(self, pk):
         
         Budget_name = self.GET["Budget_name"]
-        Item_name = self.GET["Item_name"]
+        Debt_name = self.GET["Debt_name"]
         value = self.GET["value"]
-        Item(name = Item_name)
         
         B = Budget.objects.get(name=Budget_name)
-        I = Item(name=Item_name, value=value, remain=value, budget=B)
-        I.save()
+        debt = Debt(name=Debt_name, value=value, remain=value, budget=B)
+        debt.save()
         return HttpResponseRedirect('/budget/{}'.format(pk)) 
 
     def delete_item(self, pk):
@@ -59,10 +58,23 @@ def add_income(request, Budget_id):
 
     bank = Bank.objects.get(name=Bank_name)
     budget = Budget.objects.get(id=Budget_id)
-    bank.value += int(value)
+    value = int(value.replace(',', ''))
+    bank.value += value
     bank.save()
     income = Incomes(name=name, value=value, date=date, bank=bank, budget=budget)
     income.save() 
+    for debt in Debt.objects.all():
+        if not debt.is_paid:
+            print(value)
+            if debt.remain > value:
+                debt.remain -= value
+                value = 0
+            else:
+                value -= debt.remain
+                debt.remain = 0
+                debt.is_paid = True
+            debt.save()
+
     return HttpResponseRedirect('/budget/{}/'.format(Budget_id)) 
 
 def add_expense(request, Budget_id):

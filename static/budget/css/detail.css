@@ -1,0 +1,14 @@
+body{
+	background-color: lightblue;
+}
+table{
+	border-collapse:collapse;
+}
+td{
+	padding:0px;
+	border:solid 1px #000000;
+}
+label{
+	display:block;
+	padding:20px;
+}

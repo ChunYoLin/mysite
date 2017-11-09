@@ -2,6 +2,10 @@
 <html>
 	<head>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+		{% load static %}
+		<link rel="stylesheet" type="text/css" href="{% static 'budget/css/detail.css' %}" />
+		<link rel="stylesheet" type="text/css" href="{% static 'budget/css/styles.css' %}" />
+		<link rel="stylesheet" type="text/css" href="{% static 'budget/css/demo.css' %}" />
 		<title>{{ budget.name }}</title>
 		<meta charset='utf-8'>
 	</head>
@@ -11,58 +15,47 @@
 		</div>
 		<div id="DIV_BUDGET">
 			<h1>{{ budget.name }}份預算表</h1>
+			<h2>Debt</h2>
 			<table border=1>
 				<tr>
 					<th>項目</th>
 					<th>預算</th>
 					<th>剩餘</th>
+					<th>結清</th>
 				</tr>
-			{% for item in budget.item_set.all %}
-				<tr>
-					<td>{{ item.name }}</td>
-					<td>{{ item.value }}</td>
-					<td>{{ item.remain }}</td>
-					<td>
-						<form action="delete_item" method="get" >
-							<input type="hidden" name="Item_id" value={{item.id}}>
-							<input type="submit" value="delete">
-						</form>
-					</td>
-				</tr>
-			{% endfor%}
-				<tr>
-					<td>總和</td>
-					<td id="total_budget"></td>
-					<script>
-						var x = 0;
-						{% for item in budget.item_set.all %}
-							x += {{ item.value }};
-						{% endfor %}
-						document.getElementById("total_budget").innerHTML = x;
-					</script>
-				</tr>
-			<form action="add_item" method="get" >
-				<input type="hidden" name="Budget_name" value={{budget.name}}>
+				{% for debt in budget.debt_set.all %}
+					<tr>
+						<td>{{ debt.name }}</td>
+						<td>{{ debt.value }}</td>
+						<td>{{ debt.remain }}</td>
+						{% if not debt.is_paid %}
+							<td style="color:red">{{ debt.is_paid }}</td>
+						{% else %}
+							<td>{{ debt.is_paid }}</td>
+						{% endif %}
 
-				<tr>
-					<!-- <label for="Item_name">name</label> -->
-					<td>
-						<input type="text" name="Item_name" style="width: 8em;">
-					</td>
-					<!-- <label for="value">value</label> -->
-					<td>
-						<input type="number" name="value" style="width: 3em;">
-					</td>
+					</tr>
+				{% endfor%}
+				<form action="add_debt" method="get">
+					<input type="hidden" name="Budget_name" value={{budget.name}}>
+					<tr>
+						<td>
+							<input type="text" name="Debt_name">
+						</td>
 
-					<td>
-						<input type="submit" value="add item">
-					</td>
-				</tr>
-			</form>
+						<td>
+							<input type="number" name="value">
+						</td>
+
+						<td>
+							<button type="submit" value="add">add</button>
+						</td>
+					</tr>
+				</form>
 			</table>
 		</div>
 		<div id="DIV_INCOME">
-			<h1> 收入 </h1>
+			<h2> 收入 </h2>
 			<table border=1>
 				<tr>
 					<th> 名稱 </th>
@@ -85,7 +78,7 @@
 							<input type="text" name="name" style="width: 8em;">
 						</td>
 						<td>
-							<input type="text" name="value" style="width: 8em;">
+							<input type="number" name="value" style="width: 8em;">
 						</td>
 						<td>
 							<input type="date" name="date" style="width: 10em; height: 1.8em" id=theDate>
@@ -108,7 +101,7 @@
 							</select>
 						</td>
 						<td>
-							<input type="submit" value="新增">
+							<button type="submit" value="新增">新增</button>
 						</td>
 					</tr>
 				</form>
@@ -140,7 +133,7 @@
 							<input type="text" name="name" style="width: 8em;">
 						</td>
 						<td>
-							<input type="text" name="value" style="width: 8em;">
+							<input type="number" name="value" style="width: 8em;">
 						</td>
 						<td>
 							<input type="date" name="date" style="width: 10em; height: 1.8em" id=theDate1>
@@ -170,7 +163,7 @@
 							</select>
 						</td>
 						<td>
-							<input type="submit" value="新增">
+							<button type="submit" value="新增">新增</button>
 						</td>
 					</tr>
 				</form>

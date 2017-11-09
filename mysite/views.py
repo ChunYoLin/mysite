@@ -3,7 +3,7 @@ from django.views import generic
 from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse
 
-from budget.models import Budget, Item, Bank, Investment
+from budget.models import Budget, Item, Bank
 
 class IndexView(generic.ListView):
 
