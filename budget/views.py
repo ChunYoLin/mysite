@@ -26,6 +26,7 @@ class DetailView(generic.DetailView):
         budget = kwargs['object']
         context = super(DetailView, self).get_context_data(**kwargs)
         context["Bank"] = Bank.objects.all()
+        context["Deposit"] = budget.deposit_set.all()
         context["Incomes"] = budget.incomes_set.all()
         context["Expenses"] = budget.expenses_set.all()
         

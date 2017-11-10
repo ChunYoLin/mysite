@@ -31,7 +31,6 @@ class Deposit(model_base):
         validators=[MinValueValidator(0), MaxValueValidator(100)]
     )
     value = models.IntegerField(default=0)
-    is_paid = models.BooleanField(default=False)
     budget = models.ForeignKey(
             'Budget',
             on_delete=models.CASCADE,
@@ -64,6 +63,7 @@ class Bank(model_base):
 
 class Incomes(model_base):
     value = models.IntegerField(default=0)
+    remain = models.IntegerField(default=0)
     date = models.DateField(default=timezone.now())
     bank = models.ForeignKey(
         'Bank',

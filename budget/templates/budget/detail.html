@@ -54,12 +54,44 @@
 				</form>
 			</table>
 		</div>
+		<div id="DEPOSIT">
+			<h2>存款</h2>
+			<table border=1>
+				<tr>
+					<th> 名稱 </th>
+					<th> 金額 </th>
+					<th> 比例 </th>
+				</tr>
+				
+				{% for deposit in Deposit %}
+					<tr>
+						<td>{{ deposit.name }}</td>
+						<td>{{ deposit.value }}</td>
+						<td>{{ deposit.ratio }}%</td>
+					</tr>
+				{% endfor %}
+					<tr>
+						<td>總和</td>
+						<td id="total"></td>
+						{% for deposit in Deposit %}
+						<script>
+								var i = 0
+								i += deposit.value
+								document.getElementById("total").value = i;
+						</script>
+						{% endfor %}
+					</tr>
+			</table>
+		</div>
+		<div id="DIV_LIVINGCOST">
+		</div>
 		<div id="DIV_INCOME">
 			<h2> 收入 </h2>
 			<table border=1>
 				<tr>
 					<th> 名稱 </th>
 					<th> 金額 </th>
+					<th> 扣除債務 </th>
 					<th> 日期 </th>
 					<th> 所屬資產 </th>
 				</tr>
@@ -68,6 +100,7 @@
 					<tr>
 						<td>{{ Income.name }}</td>
 						<td>{{ Income.value }}</td>
+						<td>{{ Income.remain }}</td>
 						<td>{{ Income.date }}</td>
 						<td>{{ Income.bank }}</td>
 					</tr>
