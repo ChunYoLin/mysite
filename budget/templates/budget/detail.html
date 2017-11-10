@@ -72,14 +72,14 @@
 				{% endfor %}
 					<tr>
 						<td>總和</td>
-						<td id="total"></td>
-						{% for deposit in Deposit %}
+						<td id="total_DEPOSIT"></td>
 						<script>
 								var i = 0
-								i += deposit.value
-								document.getElementById("total").value = i;
+								{% for deposit in Deposit %}
+									i += {{ deposit.value }};
+								{% endfor %}
+								document.getElementById("total_DEPOSIT").innerHTML = i;
 						</script>
-						{% endfor %}
 					</tr>
 			</table>
 		</div>
@@ -185,13 +185,6 @@
 							<select name="Bank_name">
 								{% for bank in Bank %}
 									<option>{{ bank.name }}</option>
-								{% endfor %}
-							</select>
-						</td>
-						<td>
-							<select name="Item_name">
-								{% for item in budget.item_set.all %}
-									<option>{{ item.name }}</option>
 								{% endfor %}
 							</select>
 						</td>

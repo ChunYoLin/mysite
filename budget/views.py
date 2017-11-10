@@ -57,24 +57,27 @@ def add_income(request, Budget_id):
     date = request.GET["date"]
     Bank_name = request.GET["Bank_name"]
 
-    bank = Bank.objects.get(name=Bank_name)
     budget = Budget.objects.get(id=Budget_id)
     value = int(value.replace(',', ''))
-    bank.value += value
-    bank.save()
-    income = Incomes(name=name, value=value, date=date, bank=bank, budget=budget)
-    income.save() 
+    remain = value
     for debt in Debt.objects.all():
         if not debt.is_paid:
-            print(value)
-            if debt.remain > value:
-                debt.remain -= value
-                value = 0
+            if debt.remain > remain:
+                debt.remain -= remain
+                remain = 0
             else:
-                value -= debt.remain
+                remain -= debt.remain
                 debt.remain = 0
                 debt.is_paid = True
             debt.save()
+
+    bank = Bank.objects.get(name=Bank_name)
+    bank.value += remain
+    bank.save()
+    income = Incomes(name=name, value=value, remain=remain, date=date, bank=bank, budget=budget)
+    income.save() 
+    D = Deposit(name="存款_{}".format(name), value=int(remain*0.7), budget=budget)
+    D.save()
 
     return HttpResponseRedirect('/budget/{}/'.format(Budget_id)) 
 
@@ -84,7 +87,6 @@ def add_expense(request, Budget_id):
     value = request.GET["value"]
     date = request.GET["date"]
     Bank_name = request.GET["Bank_name"]
-    Item_name = request.GET["Item_name"]
 
     bank = Bank.objects.get(name=Bank_name)
     budget = Budget.objects.get(id=Budget_id)
