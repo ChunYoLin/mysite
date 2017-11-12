@@ -1,13 +1,9 @@
-h1
-{
-	font-size:50px;
-}
-h2
-{
-	font-size:30px;
-	text-align: center;
-}
 .table
 {
+	font-size: 18px;
 	width: auto !important;
+}
+.table-responsive {
+	display:table-cell;
+	width:100%;
 }

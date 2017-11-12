@@ -6,13 +6,16 @@
 
 		<!-- Bootstrap CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+		<!-- w3c CSS -->
+		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<!-- Optional JavaScript -->
 		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+
 		{% load static %}
-		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+		<link rel="stylesheet" type="text/css" href={% static "budget/css/detail.css"%}>
 		<title>{{ budget.name }}</title>
 		<meta charset='utf-8'>
 	</head>
@@ -21,233 +24,241 @@
 			<a href="/budget/">首頁</a>
 		</div>
 		<h1>{{ budget.name }}份預算表</h1>
-			<h2>Debt</h2>
-			<table class="table">
-				<thead class=" thead-dark">
-					<tr>
-						<th>項目</th>
-						<th>預算</th>
-						<th>剩餘</th>
-						<th>結清</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for debt in budget.debt_set.all %}
+		<div class="row">
+			<div class="col-xs-4 col-md-3">
+				<h2>Debt</h2>
+				<table class="table table-responsive">
+					<thead class=" thead-dark">
 						<tr>
-							<td>{{ debt.name }}</td>
-							<td>{{ debt.value }}</td>
-							<td>{{ debt.remain }}</td>
-							{% if not debt.is_paid %}
-								<td style="color:red">{{ debt.is_paid }}</td>
-							{% else %}
-								<td>{{ debt.is_paid }}</td>
-							{% endif %}
+							<th>項目</th>
+							<th>預算</th>
+							<th>剩餘</th>
+							<th>結清</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for debt in budget.debt_set.all %}
+							<tr>
+								<td>{{ debt.name }}</td>
+								<td>{{ debt.value }}</td>
+								<td>{{ debt.remain }}</td>
+								{% if not debt.is_paid %}
+									<td style="color:red">{{ debt.is_paid }}</td>
+								{% else %}
+									<td>{{ debt.is_paid }}</td>
+								{% endif %}
 
-						</tr>
-					{% endfor%}
-					<form action="add_debt" method="get">
-						<input type="hidden" name="Budget_name" value={{budget.name}}>
-						<tr>
-							<td>
-								<input type="text" name="Debt_name" style="width: 5em;">
-							</td>
+							</tr>
+						{% endfor%}
+						<form action="add_debt" method="get">
+							<input type="hidden" name="Budget_name" value={{budget.name}}>
+							<tr>
+								<td>
+									<input type="text" name="Debt_name" style="width: 5em;">
+								</td>
 
-							<td>
-								<input type="number" name="value" style="width: 5em;">
-							</td>
-							<td>
-								<button class="w3-button w3-teal" type="submit">+</button>
-							</td>
-						</tr>
-					</form>
-				</tbody>
-			</table>
-		</div>
-			<h2>存款</h2>
-			<table class="table">
-				<thead class="thead-dark">
-					<tr>
-						<th> 名稱 </th>
-						<th> 金額 </th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for deposit in Deposit %}
+								<td>
+									<input type="number" name="value" style="width: 5em;">
+								</td>
+								<td>
+									<button class="w3-button w3-teal" type="submit">+</button>
+								</td>
+							</tr>
+						</form>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-xs-2 col-md-3">
+				<h2>存款</h2>
+				<table class="table table-responsive">
+					<thead class="thead-dark">
 						<tr>
-							<td>{{ deposit.name }}</td>
-							<td>{{ deposit.value }}</td>
+							<th> 名稱 </th>
+							<th> 金額 </th>
 						</tr>
-					{% endfor %}
-					<tr>
-						<td>總和</td>
-						<td id="total_DEPOSIT"></td>
-						<script>
-								var total_deposit = 0
-								{% for deposit in Deposit %}
-									total_deposit += {{ deposit.value }};
-								{% endfor %}
-								document.getElementById("total_DEPOSIT").innerHTML = total_deposit;
-						</script>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-			<h2>生活費</h2>
-			<table class="table">
-				<thead class="thead-dark">
-					<tr>
-						<th> 名稱 </th>
-						<th> 預算 </th>
-						<th> 剩餘 </th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>{{ LivingCost.name }}</td>
-						<td>{{ LivingCost.value }}</td>
-						<td>{{ LivingCost.remain }}</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-		<div style="clear:both;"></div>
-			<h2> 收入 </h2>
-			<table class="table">
-				<thead class="thead-dark">
-					<tr>
-						<th> 日期 </th>
-						<th> 名稱 </th>
-						<th> 金額 </th>
-						<th> 所屬資產 </th>
-						<th> 扣除債務 </th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for Income in Incomes %}
+					</thead>
+					<tbody>
+						{% for deposit in Deposit %}
+							<tr>
+								<td>{{ deposit.name }}</td>
+								<td>{{ deposit.value }}</td>
+							</tr>
+						{% endfor %}
 						<tr>
-							<td>{{ Income.date }}</td>
-							<td>{{ Income.name }}</td>
-							<td>{{ Income.value }}</td>
-							<td>{{ Income.bank }}</td>
-							<td>{{ Income.remain }}</td>
-						</tr>
-					{% endfor %}
-					<form action="add_income" method="get" >
-						<tr>
-							<td>
-								<input type="date" name="date" style="width: 10em; height: 1.8em" id=theDate>
-								<script>
-									var date = new Date();
-									var day = date.getDate();
-									var month = date.getMonth() + 1;
-									var year = date.getFullYear();
-									if (month < 10) month = "0" + month;
-									if (day < 10) day = "0" + day;
-									var today = year + "-" + month + "-" + day;       
-									document.getElementById("theDate").value = today;
-								</script>
-							</td>
-							<td>
-								<input type="text" name="name" style="width: 8em;">
-							</td>
-							<td>
-								<input type="number" name="value" style="width: 8em;">
-							</td>
-							<td>
-								<select class="w3-select" name="Bank_name">
-									{% for bank in Bank %}
-										<option>{{ bank.name }}</option>
+							<td>總和</td>
+							<td id="total_DEPOSIT"></td>
+							<script>
+									var total_deposit = 0
+									{% for deposit in Deposit %}
+										total_deposit += {{ deposit.value }};
 									{% endfor %}
-								</select>
-							</td>
-							<td>
-								<button  class="w3-button w3-teal" type="submit">+</button>
-							</td>
+									document.getElementById("total_DEPOSIT").innerHTML = total_deposit;
+							</script>
 						</tr>
-					</form>
-					<tr>
-						<td></td>
-						<td>總和</td>
-						<td id=total_income></td>
-						<td></td>
-						<td id=total_income_remain></td>
-						<script>
-								var total_income = 0
-								var total_income_remain = 0
-								{% for income in Incomes %}
-									total_income += {{ income.value }};
-									total_income_remain += {{ income.remain }};
-								{% endfor %}
-								document.getElementById("total_income").innerHTML = total_income;
-								document.getElementById("total_income_remain").innerHTML = total_income_remain;
-						</script>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-			<h2> 支出 </h2>
-			<table class="table">
-				<thead class="thead-dark">
-					<tr>
-						<th> 日期 </th>
-						<th> 名稱 </th>
-						<th> 金額 </th>
-						<th> 所屬資產 </th>
-						<th> 所屬預算 </th>
-						<th></th>
-					</tr>
-				</thead>	
-				<tbody>
-					{% for expense in Expenses %}
+					</tbody>
+				</table>
+			</div>
+			<div class="col-xs-3 col-md-3">
+				<h2>生活費</h2>
+				<table class="table table-responsive">
+					<thead class="thead-dark">
 						<tr>
-							<td>{{ expense.date }}</td>
-							<td>{{ expense.name }}</td>
-							<td>{{ expense.value }}</td>
-							<td>{{ expense.bank }}</td>
-							<td>{{ expense.item }}</td>
+							<th> 名稱 </th>
+							<th> 預算 </th>
+							<th> 剩餘 </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>{{ LivingCost.name }}</td>
+							<td>{{ LivingCost.value }}</td>
+							<td>{{ LivingCost.remain }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xs-6 col-md-5">
+				<h2> 收入 </h2>
+				<table class="table table-responsive">
+					<thead class="thead-dark">
+						<tr>
+							<th> 日期 </th>
+							<th> 名稱 </th>
+							<th> 金額 </th>
+							<th> 所屬資產 </th>
+							<th> 扣除債務 </th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for Income in Incomes %}
+							<tr>
+								<td>{{ Income.date }}</td>
+								<td>{{ Income.name }}</td>
+								<td>{{ Income.value }}</td>
+								<td>{{ Income.bank }}</td>
+								<td>{{ Income.remain }}</td>
+							</tr>
+						{% endfor %}
+						<form action="add_income" method="get" >
+							<tr>
+								<td>
+									<input type="date" name="date" style="width: 10em; height: 1.8em" id=theDate>
+									<script>
+										var date = new Date();
+										var day = date.getDate();
+										var month = date.getMonth() + 1;
+										var year = date.getFullYear();
+										if (month < 10) month = "0" + month;
+										if (day < 10) day = "0" + day;
+										var today = year + "-" + month + "-" + day;       
+										document.getElementById("theDate").value = today;
+									</script>
+								</td>
+								<td>
+									<input type="text" name="name" style="width: 8em;">
+								</td>
+								<td>
+									<input type="number" name="value" style="width: 8em;">
+								</td>
+								<td>
+									<select class="w3-select" name="Bank_name">
+										{% for bank in Bank %}
+											<option>{{ bank.name }}</option>
+										{% endfor %}
+									</select>
+								</td>
+								<td>
+									<button  class="w3-button w3-teal" type="submit">+</button>
+								</td>
+							</tr>
+						</form>
+						<tr>
 							<td></td>
-						</tr>
-					{% endfor %}
-					<form action="add_expense" method="get" >
-						<tr>
-							<td>
-								<input type="date" name="date" style="width: 10em; height: 1.8em" id=theDate1>
-								<script>
-									var date = new Date();
-									var day = date.getDate();
-									var month = date.getMonth() + 1;
-									var year = date.getFullYear();
-									if (month < 10) month = "0" + month;
-									if (day < 10) day = "0" + day;
-									var today = year + "-" + month + "-" + day;       
-									document.getElementById("theDate1").value = today;
-								</script>
-							</td>
-							<td>
-								<input type="text" name="name" style="width: 8em;">
-							</td>
-							<td>
-								<input type="number" name="value" style="width: 8em;">
-							</td>
-							<td>
-								<select class="w3-select" name="Bank_name">
-									{% for bank in Bank %}
-										<option>{{ bank.name }}</option>
+							<td>總和</td>
+							<td id=total_income></td>
+							<td></td>
+							<td id=total_income_remain></td>
+							<script>
+									var total_income = 0
+									var total_income_remain = 0
+									{% for income in Incomes %}
+										total_income += {{ income.value }};
+										total_income_remain += {{ income.remain }};
 									{% endfor %}
-								</select>
-							</td>
-							<td>
-								<select class="w3-select" name="Item_name">
-									<option>{{ LivingCost.name }}</option>
-								</select>
-							</td>
-							<td>
-								<button class="w3-button w3-teal" type="submit">+</button>
-							</td>
+									document.getElementById("total_income").innerHTML = total_income;
+									document.getElementById("total_income_remain").innerHTML = total_income_remain;
+							</script>
 						</tr>
-					</form>
-				</tbody>
-			</table>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-xs-6 col-md-5">
+				<h2> 支出 </h2>
+				<table class="table table-responsive">
+					<thead class="thead-dark">
+						<tr>
+							<th> 日期 </th>
+							<th> 名稱 </th>
+							<th> 金額 </th>
+							<th> 所屬資產 </th>
+							<th> 所屬預算 </th>
+							<th></th>
+						</tr>
+					</thead>	
+					<tbody>
+						{% for expense in Expenses %}
+							<tr>
+								<td>{{ expense.date }}</td>
+								<td>{{ expense.name }}</td>
+								<td>{{ expense.value }}</td>
+								<td>{{ expense.bank }}</td>
+								<td>{{ expense.item }}</td>
+								<td></td>
+							</tr>
+						{% endfor %}
+						<form action="add_expense" method="get" >
+							<tr>
+								<td>
+									<input type="date" name="date" style="width: 10em; height: 1.8em" id=theDate1>
+									<script>
+										var date = new Date();
+										var day = date.getDate();
+										var month = date.getMonth() + 1;
+										var year = date.getFullYear();
+										if (month < 10) month = "0" + month;
+										if (day < 10) day = "0" + day;
+										var today = year + "-" + month + "-" + day;       
+										document.getElementById("theDate1").value = today;
+									</script>
+								</td>
+								<td>
+									<input type="text" name="name" style="width: 8em;">
+								</td>
+								<td>
+									<input type="number" name="value" style="width: 8em;">
+								</td>
+								<td>
+									<select class="w3-select" name="Bank_name">
+										{% for bank in Bank %}
+											<option>{{ bank.name }}</option>
+										{% endfor %}
+									</select>
+								</td>
+								<td>
+									<select class="w3-select" name="Item_name">
+										<option>{{ LivingCost.name }}</option>
+									</select>
+								</td>
+								<td>
+									<button class="w3-button w3-teal" type="submit">+</button>
+								</td>
+							</tr>
+						</form>
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</body>
 </html>
