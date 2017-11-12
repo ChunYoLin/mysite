@@ -36,6 +36,16 @@ class Deposit(model_base):
             on_delete=models.CASCADE,
             null=True
     )
+    income = models.OneToOneField(
+            'Incomes',
+            on_delete=models.CASCADE,
+            null=True
+    )
+    def save(self, *args, **kwargs):
+        r = self.income.remain
+        self.value = int(r*(self.ratio/100.))
+        self.name = "存款_{}".format(self.income.name)
+        super().save(*args, **kwargs)
     
 class LivingCost(model_base):
     ratio = models.IntegerField(
@@ -49,6 +59,15 @@ class LivingCost(model_base):
             on_delete=models.CASCADE,
             null=True
     )
+    def save(self, *args, **kwargs):
+        self.value = 0
+        for i in self.incomes_set.all():
+            self.value += i.remain 
+        self.value *= (self.ratio/100.)
+        self.remain = self.value
+        for ex in self.expenses_set.all():
+            self.remain -= ex.value
+        super().save(*args, **kwargs)
     
 class Item(model_base):
     value = models.IntegerField(default=0)
@@ -71,6 +90,11 @@ class Incomes(model_base):
     )
     budget = models.ForeignKey(
         'Budget',
+        on_delete=models.CASCADE,
+        null=True
+    )
+    livingcost = models.ForeignKey(
+        'LivingCost',
         on_delete=models.CASCADE,
         null=True
     )

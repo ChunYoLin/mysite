@@ -80,7 +80,7 @@ def add_income(request, Budget_id):
     income = Incomes(name=name, value=value, remain=remain, date=date, bank=bank, budget=budget)
     income.save() 
 
-    D = Deposit(name="存款_{}".format(name), value=int(remain*0.7), budget=budget)
+    D = Deposit(name="存款_{}".format(name), value=int(remain*0.7), budget=budget, income=income)
     D.save()
     
     LC = LivingCost.objects.get(name="生活費", budget=budget)

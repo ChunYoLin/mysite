@@ -115,9 +115,9 @@
 			<table class="table">
 				<thead class="thead-dark">
 					<tr>
+						<th> 日期 </th>
 						<th> 名稱 </th>
 						<th> 金額 </th>
-						<th> 日期 </th>
 						<th> 所屬資產 </th>
 						<th> 扣除債務 </th>
 					</tr>
@@ -125,38 +125,15 @@
 				<tbody>
 					{% for Income in Incomes %}
 						<tr>
+							<td>{{ Income.date }}</td>
 							<td>{{ Income.name }}</td>
 							<td>{{ Income.value }}</td>
-							<td>{{ Income.date }}</td>
 							<td>{{ Income.bank }}</td>
 							<td>{{ Income.remain }}</td>
 						</tr>
 					{% endfor %}
-					<tr>
-						<td>總和</td>
-						<td id=total_income></td>
-						<td></td>
-						<td></td>
-						<td id=total_income_remain></td>
-						<script>
-								var total_income = 0
-								var total_income_remain = 0
-								{% for income in Incomes %}
-									total_income += {{ income.value }};
-									total_income_remain += {{ income.remain }};
-								{% endfor %}
-								document.getElementById("total_income").innerHTML = total_income;
-								document.getElementById("total_income_remain").innerHTML = total_income_remain;
-						</script>
-					</tr>
 					<form action="add_income" method="get" >
 						<tr>
-							<td>
-								<input type="text" name="name" style="width: 8em;">
-							</td>
-							<td>
-								<input type="number" name="value" style="width: 8em;">
-							</td>
 							<td>
 								<input type="date" name="date" style="width: 10em; height: 1.8em" id=theDate>
 								<script>
@@ -171,6 +148,12 @@
 								</script>
 							</td>
 							<td>
+								<input type="text" name="name" style="width: 8em;">
+							</td>
+							<td>
+								<input type="number" name="value" style="width: 8em;">
+							</td>
+							<td>
 								<select class="w3-select" name="Bank_name">
 									{% for bank in Bank %}
 										<option>{{ bank.name }}</option>
@@ -182,6 +165,23 @@
 							</td>
 						</tr>
 					</form>
+					<tr>
+						<td></td>
+						<td>總和</td>
+						<td id=total_income></td>
+						<td></td>
+						<td id=total_income_remain></td>
+						<script>
+								var total_income = 0
+								var total_income_remain = 0
+								{% for income in Incomes %}
+									total_income += {{ income.value }};
+									total_income_remain += {{ income.remain }};
+								{% endfor %}
+								document.getElementById("total_income").innerHTML = total_income;
+								document.getElementById("total_income_remain").innerHTML = total_income_remain;
+						</script>
+					</tr>
 				</tbody>
 			</table>
 		</div>
@@ -189,9 +189,9 @@
 			<table class="table">
 				<thead class="thead-dark">
 					<tr>
+						<th> 日期 </th>
 						<th> 名稱 </th>
 						<th> 金額 </th>
-						<th> 日期 </th>
 						<th> 所屬資產 </th>
 						<th> 所屬預算 </th>
 						<th></th>
@@ -200,9 +200,9 @@
 				<tbody>
 					{% for expense in Expenses %}
 						<tr>
+							<td>{{ expense.date }}</td>
 							<td>{{ expense.name }}</td>
 							<td>{{ expense.value }}</td>
-							<td>{{ expense.date }}</td>
 							<td>{{ expense.bank }}</td>
 							<td>{{ expense.item }}</td>
 							<td></td>
@@ -210,12 +210,6 @@
 					{% endfor %}
 					<form action="add_expense" method="get" >
 						<tr>
-							<td>
-								<input type="text" name="name" style="width: 8em;">
-							</td>
-							<td>
-								<input type="number" name="value" style="width: 8em;">
-							</td>
 							<td>
 								<input type="date" name="date" style="width: 10em; height: 1.8em" id=theDate1>
 								<script>
@@ -228,6 +222,12 @@
 									var today = year + "-" + month + "-" + day;       
 									document.getElementById("theDate1").value = today;
 								</script>
+							</td>
+							<td>
+								<input type="text" name="name" style="width: 8em;">
+							</td>
+							<td>
+								<input type="number" name="value" style="width: 8em;">
 							</td>
 							<td>
 								<select class="w3-select" name="Bank_name">
