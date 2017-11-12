@@ -27,8 +27,9 @@ class DetailView(generic.DetailView):
         context = super(DetailView, self).get_context_data(**kwargs)
         context["Bank"] = Bank.objects.all()
         context["Deposit"] = budget.deposit_set.all()
-        context["Incomes"] = budget.incomes_set.all()
-        context["Expenses"] = budget.expenses_set.all()
+        context["LivingCost"] = LivingCost.objects.get_or_create(name="生活費", budget=budget)[0]
+        context["Incomes"] = budget.incomes_set.all().order_by('date')
+        context["Expenses"] = budget.expenses_set.all().order_by('date')
         
         return context
     
@@ -60,6 +61,7 @@ def add_income(request, Budget_id):
     budget = Budget.objects.get(id=Budget_id)
     value = int(value.replace(',', ''))
     remain = value
+    
     for debt in Debt.objects.all():
         if not debt.is_paid:
             if debt.remain > remain:
@@ -74,10 +76,17 @@ def add_income(request, Budget_id):
     bank = Bank.objects.get(name=Bank_name)
     bank.value += remain
     bank.save()
+    
     income = Incomes(name=name, value=value, remain=remain, date=date, bank=bank, budget=budget)
     income.save() 
+
     D = Deposit(name="存款_{}".format(name), value=int(remain*0.7), budget=budget)
     D.save()
+    
+    LC = LivingCost.objects.get(name="生活費", budget=budget)
+    LC.value += int(remain*0.3)
+    LC.remain += int(remain*0.3)
+    LC.save()
 
     return HttpResponseRedirect('/budget/{}/'.format(Budget_id)) 
 
@@ -87,10 +96,11 @@ def add_expense(request, Budget_id):
     value = request.GET["value"]
     date = request.GET["date"]
     Bank_name = request.GET["Bank_name"]
+    Item_name = request.GET["Item_name"]
 
     bank = Bank.objects.get(name=Bank_name)
     budget = Budget.objects.get(id=Budget_id)
-    item = Item.objects.get(name=Item_name, budget=budget)
+    item = LivingCost.objects.get(name=Item_name, budget=budget)
     bank.value -= int(value)
     bank.save()
     item.remain -= int(value)

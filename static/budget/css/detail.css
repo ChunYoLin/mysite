@@ -1,14 +1,13 @@
-body{
-	background-color: lightblue;
+h1
+{
+	font-size:50px;
 }
-table{
-	border-collapse:collapse;
+h2
+{
+	font-size:30px;
+	text-align: center;
 }
-td{
-	padding:0px;
-	border:solid 1px #000000;
-}
-label{
-	display:block;
-	padding:20px;
+.table
+{
+	width: auto !important;
 }

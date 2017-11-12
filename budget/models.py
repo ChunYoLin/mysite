@@ -83,7 +83,7 @@ class Expenses(model_base):
         on_delete=models.CASCADE,
     )
     item = models.ForeignKey(
-        'Item',
+        'LivingCost',
         on_delete=models.CASCADE,
     )
     budget = models.ForeignKey(
