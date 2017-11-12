@@ -1,9 +1,11 @@
 .table
 {
-	font-size: 18px;
+	font-size: 16px;
 	width: auto !important;
 }
 .table-responsive {
 	display:table-cell;
 	width:100%;
+	/* overflow-y:scroll; */
+	/* height:200px; */
 }
