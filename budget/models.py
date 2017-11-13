@@ -26,9 +26,9 @@ class Debt(model_base):
     )
 
 class Deposit(model_base):
-    ratio = models.IntegerField(
-        default=70,
-        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    ratio = models.FloatField(
+        default=0.6,
+        validators=[MinValueValidator(0.), MaxValueValidator(1.0)]
     )
     value = models.IntegerField(default=0)
     budget = models.ForeignKey(
@@ -41,16 +41,19 @@ class Deposit(model_base):
             on_delete=models.CASCADE,
             null=True
     )
-    def save(self, *args, **kwargs):
+    
+    def update(self, *args, **kwargs):
         r = self.income.remain
-        self.value = int(r*(self.ratio/100.))
+        self.value = int(r*(self.ratio))
         self.name = "存款_{}".format(self.income.name)
+
+    def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
     
 class LivingCost(model_base):
-    ratio = models.IntegerField(
-        default=30,
-        validators=[MinValueValidator(0), MaxValueValidator(100)]
+    ratio = models.FloatField(
+        default=0.3,
+        validators=[MinValueValidator(0.), MaxValueValidator(1.0)]
     )
     value = models.IntegerField(default=0)
     remain = models.IntegerField(default=0)
@@ -59,14 +62,18 @@ class LivingCost(model_base):
             on_delete=models.CASCADE,
             null=True
     )
-    def save(self, *args, **kwargs):
+
+    def update(self, *args, **kwargs):
         self.value = 0
-        for i in self.incomes_set.all():
+        for i in self.budget.incomes_set.all():
             self.value += i.remain 
-        self.value *= (self.ratio/100.)
+        self.value *= self.ratio
+        self.value = int(self.value)
         self.remain = self.value
-        for ex in self.expenses_set.all():
+        for ex in self.expenses_set.filter(item=self):
             self.remain -= ex.value
+
+    def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
     
 class Item(model_base):
@@ -90,11 +97,6 @@ class Incomes(model_base):
     )
     budget = models.ForeignKey(
         'Budget',
-        on_delete=models.CASCADE,
-        null=True
-    )
-    livingcost = models.ForeignKey(
-        'LivingCost',
         on_delete=models.CASCADE,
         null=True
     )

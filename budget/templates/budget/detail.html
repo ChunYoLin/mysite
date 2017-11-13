@@ -99,7 +99,7 @@
 				</table>
 			</div>
 			<div class="col-xs-3 col-md-auto">
-				<h2>生活費</h2>
+				<h2>生活預算</h2>
 				<table class="table table-responsive">
 					<thead class="thead-light">
 						<tr>
@@ -109,11 +109,13 @@
 						</tr>
 					</thead>
 					<tbody>
+						{% for LC in LivingCost%}
 						<tr>
-							<td>{{ LivingCost.name }}</td>
-							<td>{{ LivingCost.value }}</td>
-							<td>{{ LivingCost.remain }}</td>
+							<td>{{ LC.name }}</td>
+							<td>{{ LC.value }}</td>
+							<td>{{ LC.remain }}</td>
 						</tr>
+						{% endfor %}
 					</tbody>
 				</table>
 			</div>
@@ -251,7 +253,9 @@
 								<td>
 									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Item_name">
 										<option selected>Choose...</option>
-										<option>{{ LivingCost.name }}</option>
+										{% for LC in LivingCost %}
+											<option>{{ LC.name }}</option>
+										{% endfor %}
 									</select>
 								</td>
 								<td>
