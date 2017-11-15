@@ -1,36 +1,27 @@
 from django.db import models
 from django.utils import timezone
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericRelation
 
-    
-class model_base(models.Model):
-    name = models.CharField(max_length=100)
+from budget.base import *
 
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        abstract=True
 
 class Budget(model_base):
-    date = models.DateField()
+    pass
 
 class Debt(model_base):
-    value = models.IntegerField(default=0)
     remain = models.IntegerField(default=0)
     is_paid = models.BooleanField(default=False)
+    expenses = GenericRelation("Expenses")
     budget = models.ForeignKey(
             'Budget',
             on_delete=models.CASCADE,
             null=True
     )
 
-class Deposit(model_base):
-    ratio = models.FloatField(
-        default=0.6,
-        validators=[MinValueValidator(0.), MaxValueValidator(1.0)]
-    )
-    value = models.IntegerField(default=0)
+class Deposit(model_base, budget_ratio):
     budget = models.ForeignKey(
             'Budget',
             on_delete=models.CASCADE,
@@ -50,12 +41,8 @@ class Deposit(model_base):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
     
-class LivingCost(model_base):
-    ratio = models.FloatField(
-        default=0.3,
-        validators=[MinValueValidator(0.), MaxValueValidator(1.0)]
-    )
-    value = models.IntegerField(default=0)
+class LivingCost(model_base, budget_ratio):
+    expenses = GenericRelation("Expenses")
     remain = models.IntegerField(default=0)
     budget = models.ForeignKey(
             'Budget',
@@ -70,27 +57,39 @@ class LivingCost(model_base):
         self.value *= self.ratio
         self.value = int(self.value)
         self.remain = self.value
-        for ex in self.expenses_set.filter(item=self):
+        for ex in self.expenses.all():
             self.remain -= ex.value
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-    
-class Item(model_base):
-    value = models.IntegerField(default=0)
+
+class BackupCost(model_base, budget_ratio):
+    expenses = GenericRelation("Expenses")
     remain = models.IntegerField(default=0)
     budget = models.ForeignKey(
-        'Budget',
-        on_delete=models.CASCADE,
+            'Budget',
+            on_delete=models.CASCADE,
+            null=True
     )
+
+    def update(self, *args, **kwargs):
+        self.value = 0
+        for i in self.budget.incomes_set.all():
+            self.value += i.remain 
+        self.value *= self.ratio
+        self.value = int(self.value)
+        self.remain = self.value
+        for ex in self.expenses.all():
+            self.remain -= ex.value
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
 
 class Bank(model_base):
-    value = models.IntegerField(default=0)
+    pass
 
 class Incomes(model_base):
-    value = models.IntegerField(default=0)
     remain = models.IntegerField(default=0)
-    date = models.DateField(default=timezone.now())
     bank = models.ForeignKey(
         'Bank',
         on_delete=models.CASCADE,
@@ -98,23 +97,19 @@ class Incomes(model_base):
     budget = models.ForeignKey(
         'Budget',
         on_delete=models.CASCADE,
-        null=True
     )
 
-class Expenses(model_base):
-    value = models.IntegerField(default=0)
-    date = models.DateField(default=timezone.now())
+class Expenses(model_base, Category):
     bank = models.ForeignKey(
         'Bank',
         on_delete=models.CASCADE,
     )
-    item = models.ForeignKey(
-        'LivingCost',
-        on_delete=models.CASCADE,
-    )
+    
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.PositiveIntegerField(null=True)
+    belong_to = GenericForeignKey('content_type', 'object_id')
     budget = models.ForeignKey(
         'Budget',
         on_delete=models.CASCADE,
-        null = True
     )
 

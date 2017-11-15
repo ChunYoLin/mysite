@@ -25,13 +25,13 @@
 		</div>
 		<h1>{{ budget.name }}份預算表</h1>
 		<div class="row">
-			<div class="col-xs-4 col-md-auto">
+			<div class="col-sm-4 col-md-auto">
 				<h2>債務</h2>
 				<table class="table table-responsive">
 					<thead class=" thead-light">
 						<tr>
 							<th>項目</th>
-							<th>預算</th>
+							<th>金額</th>
 							<th>剩餘</th>
 							<th>結清</th>
 						</tr>
@@ -56,9 +56,8 @@
 								<td>
 									<input class="form-control" type="text" name="Debt_name">
 								</td>
-
-								<td>
-									<input class="form-control" type="number" name="value">
+								<td class>
+									<input class="form-control"  type="number" name="value">
 								</td>
 								<td>
 									<button class="btn btn-primary" type="submit">submit</button>
@@ -99,6 +98,27 @@
 				</table>
 			</div>
 			<div class="col-xs-3 col-md-auto">
+				<h2>備用</h2>
+				<table class="table table-responsive">
+					<thead class="thead-light">
+						<tr>
+							<th> 名稱 </th>
+							<th> 預算 </th>
+							<th> 剩餘 </th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for BC in BackupCost%}
+						<tr>
+							<td>{{ BC.name }}</td>
+							<td>{{ BC.value }}</td>
+							<td>{{ BC.remain }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<div class="col-xs-3 col-md-auto">
 				<h2>生活預算</h2>
 				<table class="table table-responsive">
 					<thead class="thead-light">
@@ -114,6 +134,16 @@
 							<td>{{ LC.name }}</td>
 							<td>{{ LC.value }}</td>
 							<td>{{ LC.remain }}</td>
+						</tr>
+						{% endfor %}
+						<tr>
+							<th> 分類 </th>
+							<th> 總花費 </th>
+						</tr>
+						{% for c_name, value in CHOICES.items %}
+						<tr>
+							<td> {{ c_name }} </td>
+							<td> {{ value }} </td>
 						</tr>
 						{% endfor %}
 					</tbody>
@@ -206,7 +236,7 @@
 							<th> 名稱 </th>
 							<th> 金額 </th>
 							<th> 所屬資產 </th>
-							<th> 所屬預算 </th>
+							<th> 分類 </th>
 							<th></th>
 						</tr>
 					</thead>	
@@ -217,7 +247,7 @@
 								<td>{{ expense.name }}</td>
 								<td>{{ expense.value }}</td>
 								<td>{{ expense.bank }}</td>
-								<td>{{ expense.item }}</td>
+								<td>{{ expense.get_category_display }}</td>
 								<td></td>
 							</tr>
 						{% endfor %}
@@ -253,8 +283,8 @@
 								<td>
 									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Item_name">
 										<option selected>Choose...</option>
-										{% for LC in LivingCost %}
-											<option>{{ LC.name }}</option>
+										{% for c_name, value in CHOICES.items %}
+											<option>{{ c_name }}</option>
 										{% endfor %}
 									</select>
 								</td>

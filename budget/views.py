@@ -2,9 +2,18 @@ from django.shortcuts import render
 from django.views import generic
 from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse
+from django.template.defaulttags import register
 
+from collections import OrderedDict
+
+from .base import *
 from .models import *
 # Create your views here.
+
+@register.filter
+def get_dict_item(dictionary, key):
+    return dictionary.get(key)
+
 class IndexView(generic.ListView):
 
     model = Budget
@@ -21,15 +30,24 @@ class DetailView(generic.DetailView):
 
     model = Budget
     template_name = 'budget/detail.html'
+    
 
     def get_context_data(self, **kwargs):
         budget = kwargs['object']
         context = super(DetailView, self).get_context_data(**kwargs)
         context["Bank"] = Bank.objects.all()
         context["Deposit"] = budget.deposit_set.all()
+        context["BackupCost"] = budget.backupcost_set.all()
         context["LivingCost"] = budget.livingcost_set.all()
         context["Incomes"] = budget.incomes_set.all().order_by('date')
         context["Expenses"] = budget.expenses_set.all().order_by('date')
+        choices = OrderedDict()
+        for c_id, c_name in CHOICES:
+            choices[c_name] = 0
+            for e in budget.expenses_set.filter(category=c_id):
+                choices[c_name] += e.value
+        context["CHOICES"] = choices
+            
         
         return context
     
@@ -86,12 +104,12 @@ def add_income(request, Budget_id):
     D.save()
 
     ratio = 0.3
-    LC = LivingCost.objects.get_or_create(name="生活費", ratio=ratio, budget=budget)[0]
+    LC = LivingCost.objects.get_or_create(name="生活/娛樂費", ratio=ratio, budget=budget)[0]
     LC.update()
     LC.save()
 
     ratio = 0.1
-    LC = LivingCost.objects.get_or_create(name="娛樂/備用", ratio=ratio, budget=budget)[0]
+    LC = LivingCost.objects.get_or_create(name="備用", ratio=ratio, budget=budget)[0]
     LC.update()
     LC.save()
 
