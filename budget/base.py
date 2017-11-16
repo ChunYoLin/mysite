@@ -24,6 +24,10 @@ CHOICES = (
     ("Education", "育"),
     ("Entertainment", "樂"),
 )
+CHOICES_dict = (
+    {"食": "Food"},
+    {"衣": "Clothing"},
+)
 class Category(models.Model):
     category = models.CharField(
         max_length=30,

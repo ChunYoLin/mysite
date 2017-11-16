@@ -3,6 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from .models import *
 
+admin.site.register(Year)
 admin.site.register(Budget)
 admin.site.register(Debt)
 admin.site.register(Deposit)

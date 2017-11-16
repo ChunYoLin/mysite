@@ -1,11 +1,10 @@
 {% extends 'budget/base.html' %}
 
 {% block budget %}
-	{% for budget in Budget %}
-		<li><a href="/budget/{{budget.id}}">{{ budget }}</a></li>
+	{% for year in Year %}
+	<h4><li><a href="/budget/{{year.name}}">{{ year }}</a></li></h3>
 	{% endfor %}
 {% endblock %}
-
 {% block asset %}
 	<h1> 資產 </h1>
 	{% if Bank%}

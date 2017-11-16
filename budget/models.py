@@ -7,9 +7,20 @@ from django.contrib.contenttypes.fields import GenericRelation
 
 from budget.base import *
 
+class Year(models.Model):
+    name = models.IntegerField(
+        default=2017,
+        validators=[MinValueValidator(2000), MaxValueValidator(2100)]
+        )
+    def __str__(self):
+        return str(self.name)
 
 class Budget(model_base):
-    pass
+    year = models.ForeignKey(
+            'Year',
+            on_delete=models.CASCADE,
+            null=True
+    )
 
 class Debt(model_base):
     remain = models.IntegerField(default=0)

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse
@@ -15,133 +15,149 @@ def get_dict_item(dictionary, key):
     return dictionary.get(key)
 
 class IndexView(generic.ListView):
-
-    model = Budget
+    model = Year
     template_name = 'budget/index.html'
 
     def get_context_data(self, **kwargs):
         
         context = super(IndexView, self).get_context_data(**kwargs)
+        context["Year"] = Year.objects.all()
         context["Budget"] = Budget.objects.all()
         context["Bank"] = Bank.objects.all()
         return context 
     
-class DetailView(generic.DetailView):
+class YearView(generic.ListView):
+    model = Year
+    template_name = 'budget/year.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(YearView, self).get_context_data(**kwargs)
+        Year_name = self.kwargs['Year_name']
+        year = Year.objects.get(name=Year_name)
+        context["year"] = year
+        context["Budget"] = Budget.objects.filter(year=year)
+        context["Bank"] = Bank.objects.all()
+        return context 
+
+class BudgetView(generic.DetailView):
 
     model = Budget
-    template_name = 'budget/detail.html'
-    
+    template_name = 'budget/budget.html'
+    pk_url_kwarg = "Budget_id"
+    choices = OrderedDict()
+    for c_id, c_name in CHOICES:
+        choices[c_name] = 0
 
     def get_context_data(self, **kwargs):
         budget = kwargs['object']
-        context = super(DetailView, self).get_context_data(**kwargs)
+        context = super(BudgetView, self).get_context_data(**kwargs)
+        Year_name = self.kwargs['Year_name']
+        year = Year.objects.get(name=Year_name)
+        self.year = year
+        context["year"] = year
         context["Bank"] = Bank.objects.all()
         context["Deposit"] = budget.deposit_set.all()
         context["BackupCost"] = budget.backupcost_set.all()
         context["LivingCost"] = budget.livingcost_set.all()
         context["Incomes"] = budget.incomes_set.all().order_by('date')
         context["Expenses"] = budget.expenses_set.all().order_by('date')
-        choices = OrderedDict()
         for c_id, c_name in CHOICES:
-            choices[c_name] = 0
             for e in budget.expenses_set.filter(category=c_id):
-                choices[c_name] += e.value
-        context["CHOICES"] = choices
+                self.choices[c_name] += e.value
+        context["CHOICES"] = self.choices
         
         return context
     
-    def add_debt(self, pk):
+    def add_debt(self, Year_name, Budget_id):
         
-        Budget_name = self.GET["Budget_name"]
         Debt_name = self.GET["Debt_name"]
         value = self.GET["value"]
         
-        B = Budget.objects.get(name=Budget_name)
+        B = Budget.objects.get(id=Budget_id)
         debt = Debt(name=Debt_name, value=value, remain=value, budget=B)
         debt.save()
-        return HttpResponseRedirect('/budget/{}'.format(pk)) 
+        return HttpResponseRedirect('/budget/{}/{}'.format(Year_name, Budget_id)) 
     
-    def pay_debt(self, pk):
+    def pay_debt(self, Year_name, Budget_id):
 
-        Budget_name = self.GET["Budget_name"]
         Debt_name = self.GET["Debt_name"]
-        B = Budget.objects.get(name=Budget_name)
+        B = Budget.objects.get(id=Budget_id)
         debt = Debt.objects.get(name=Debt_name, budget=B)
         debt.is_paid = True
         debt.save()
-        return HttpResponseRedirect('/budget/{}'.format(pk)) 
+        return HttpResponseRedirect('/budget/{}/{}'.format(Year_name, Budget_id)) 
 
-    def delete_item(self, pk):
+    def delete_item(self, Year_name, Budget_id):
         
         Item_id = self.GET['Item_id']
         I = Item.objects.get(id=Item_id)
         I.delete()
-        return HttpResponseRedirect('/budget/{}'.format(pk)) 
+        return HttpResponseRedirect('/budget/{}/{}'.format(Year_name, Budget_id)) 
 
-def add_income(request, Budget_id):
-    
-    name = request.GET["name"] 
-    value = request.GET["value"]
-    date = request.GET["date"]
-    Bank_name = request.GET["Bank_name"]
+    def add_income(self, Year_name, Budget_id):
+        
+        name = self.GET["name"] 
+        value = self.GET["value"]
+        date = self.GET["date"]
+        Bank_name = self.GET["Bank_name"]
 
-    budget = Budget.objects.get(id=Budget_id)
-    value = int(value.replace(',', ''))
-    income_remain = value
-    
-    for debt in Debt.objects.all():
-        if not debt.is_paid:
-            if debt.remain > income_remain:
-                debt.remain -= income_remain
-                remain = 0
-            else:
-                income_remain -= debt.remain
-                debt.remain = 0
-                debt.is_distributed = True
-            debt.save()
+        budget = Budget.objects.get(id=Budget_id)
+        value = int(value.replace(',', ''))
+        income_remain = value
+        
+        for debt in Debt.objects.all():
+            if not debt.is_paid:
+                if debt.remain > income_remain:
+                    debt.remain -= income_remain
+                    remain = 0
+                else:
+                    income_remain -= debt.remain
+                    debt.remain = 0
+                    debt.is_distributed = True
+                debt.save()
 
-    bank = Bank.objects.get(name=Bank_name)
-    bank.value += income_remain
-    bank.save()
-    
-    income = Incomes(name=name, value=value, remain=income_remain, date=date, bank=bank, budget=budget)
-    income.save() 
+        bank = Bank.objects.get(name=Bank_name)
+        bank.value += income_remain
+        bank.save()
+        
+        income = Incomes(name=name, value=value, remain=income_remain, date=date, bank=bank, budget=budget)
+        income.save() 
 
-    ratio = 0.6
-    D = Deposit(name="存款_{}".format(name), ratio=ratio, budget=budget, income=income)
-    D.update()
-    D.save()
+        ratio = 0.6
+        D = Deposit(name="存款_{}".format(name), ratio=ratio, budget=budget, income=income)
+        D.update()
+        D.save()
 
-    ratio = 0.3
-    LC = LivingCost.objects.get_or_create(name="生活/娛樂費", ratio=ratio, budget=budget)[0]
-    LC.update()
-    LC.save()
+        ratio = 0.3
+        LC = LivingCost.objects.get_or_create(name="生活/娛樂費", ratio=ratio, budget=budget)[0]
+        LC.update()
+        LC.save()
 
-    ratio = 0.1
-    LC = LivingCost.objects.get_or_create(name="備用", ratio=ratio, budget=budget)[0]
-    LC.update()
-    LC.save()
+        ratio = 0.1
+        BC = BackupCost.objects.get_or_create(name="備用", ratio=ratio, budget=budget)[0]
+        BC.update()
+        BC.save()
 
-    return HttpResponseRedirect('/budget/{}/'.format(Budget_id)) 
+        return HttpResponseRedirect('/budget/{}/{}'.format(Year_name, Budget_id)) 
 
-def add_expense(request, Budget_id):
-    
-    name = request.GET["name"] 
-    value = request.GET["value"]
-    date = request.GET["date"]
-    Bank_name = request.GET["Bank_name"]
-    Item_name = request.GET["Item_name"]
+    def add_expense(self, Year_name, Budget_id):
+        
+        name = self.GET["name"] 
+        value = self.GET["value"]
+        date = self.GET["date"]
+        Bank_name = self.GET["Bank_name"]
+        Category_name = self.GET["Category_name"]
 
-    bank = Bank.objects.get(name=Bank_name)
-    budget = Budget.objects.get(id=Budget_id)
-    item = LivingCost.objects.get(name=Item_name, budget=budget)
-    bank.value -= int(value)
-    bank.save()
-    item.remain -= int(value)
-    item.save()
-    expense = Expenses(name=name, value=value, date=date, bank=bank, item=item, budget=budget)
-    expense.save() 
-    return HttpResponseRedirect('/budget/{}/'.format(Budget_id)) 
+        bank = Bank.objects.get(name=Bank_name)
+        budget = Budget.objects.get(id=Budget_id)
+        LC = LivingCost.objects.get(name="生活/娛樂費", budget=budget)
+        bank.value -= int(value)
+        bank.save()
+        LC.remain -= int(value)
+        LC.save()
+        expense = Expenses(name=name, value=value, date=date, bank=bank, category=Category_name, budget=budget)
+        expense.save() 
+        return HttpResponseRedirect('/budget/{}/{}'.format(Year_name, Budget_id)) 
 
 def asset_transfer(request):
     

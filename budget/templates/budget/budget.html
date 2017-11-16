@@ -21,7 +21,7 @@
 	</head>
 	<body>
 		<div>
-			<a href="/budget/">首頁</a>
+			<a href="/budget/{{year.name}}">上一頁</a>
 		</div>
 		<h1>{{ budget.name }}份預算表</h1>
 		<div class="row">
@@ -45,7 +45,6 @@
 								<td>{{ debt.remain }}</td>
 								<td>{{ debt.is_distributed}}</td>
 								<form action="pay_debt" method="get">
-									<input type="hidden" name="Budget_name" value={{budget.name}}>
 									<input type="hidden" name="Debt_name" value={{debt.name}}>
 								{% if not debt.is_paid %}
 									<td><button class="btn btn-danger" type="submit" value="pay_debt">尚未結清</button></td>
@@ -57,7 +56,6 @@
 							</tr>
 						{% endfor%}
 						<form action="add_debt" method="get">
-							<input type="hidden" name="Budget_name" value={{budget.name}}>
 							<tr>
 								<td>
 									<input class="form-control" type="text" name="Debt_name">
@@ -296,7 +294,7 @@
 									</select>
 								</td>
 								<td>
-									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Item_name">
+									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Category_name">
 										<option selected>Choose...</option>
 										{% for c_name, value in CHOICES.items %}
 											<option>{{ c_name }}</option>
