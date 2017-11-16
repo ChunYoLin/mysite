@@ -1,12 +1,11 @@
-#DIV_BUDGETS
+.table
 {
-	/* float:left; */
+	font-size: 16px;
+	width: auto !important;
 }
-#DIV_ASSET
-{
-	/* margin-left: 100px; */
-	/* float:left; */
-	/* position: fixed; */
-	/* right: 0; */
-	/* bottom: 0; */
+.table-responsive {
+	display:table-cell;
+	width:100%;
+	/* overflow-y:scroll; */
+	/* height:200px; */
 }

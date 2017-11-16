@@ -47,7 +47,6 @@ class DetailView(generic.DetailView):
             for e in budget.expenses_set.filter(category=c_id):
                 choices[c_name] += e.value
         context["CHOICES"] = choices
-            
         
         return context
     
@@ -59,6 +58,16 @@ class DetailView(generic.DetailView):
         
         B = Budget.objects.get(name=Budget_name)
         debt = Debt(name=Debt_name, value=value, remain=value, budget=B)
+        debt.save()
+        return HttpResponseRedirect('/budget/{}'.format(pk)) 
+    
+    def pay_debt(self, pk):
+
+        Budget_name = self.GET["Budget_name"]
+        Debt_name = self.GET["Debt_name"]
+        B = Budget.objects.get(name=Budget_name)
+        debt = Debt.objects.get(name=Debt_name, budget=B)
+        debt.is_paid = True
         debt.save()
         return HttpResponseRedirect('/budget/{}'.format(pk)) 
 
@@ -78,24 +87,24 @@ def add_income(request, Budget_id):
 
     budget = Budget.objects.get(id=Budget_id)
     value = int(value.replace(',', ''))
-    remain = value
+    income_remain = value
     
     for debt in Debt.objects.all():
         if not debt.is_paid:
-            if debt.remain > remain:
-                debt.remain -= remain
+            if debt.remain > income_remain:
+                debt.remain -= income_remain
                 remain = 0
             else:
-                remain -= debt.remain
+                income_remain -= debt.remain
                 debt.remain = 0
-                debt.is_paid = True
+                debt.is_distributed = True
             debt.save()
 
     bank = Bank.objects.get(name=Bank_name)
-    bank.value += remain
+    bank.value += income_remain
     bank.save()
     
-    income = Incomes(name=name, value=value, remain=remain, date=date, bank=bank, budget=budget)
+    income = Incomes(name=name, value=value, remain=income_remain, date=date, bank=bank, budget=budget)
     income.save() 
 
     ratio = 0.6

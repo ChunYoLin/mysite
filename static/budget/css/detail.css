@@ -3,9 +3,15 @@
 	font-size: 16px;
 	width: auto !important;
 }
-.table-responsive {
+.table-responsive
+{
 	display:table-cell;
-	width:100%;
-	/* overflow-y:scroll; */
-	/* height:200px; */
+	/* width:100%; */
+}
+.category
+{
+	float:right;
+	position: absolute;
+	top: 0;
+	right: 0;
 }

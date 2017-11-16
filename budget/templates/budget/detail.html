@@ -25,7 +25,7 @@
 		</div>
 		<h1>{{ budget.name }}份預算表</h1>
 		<div class="row">
-			<div class="col-sm-4 col-md-auto">
+			<div class="col-sm-4 col-md-3">
 				<h2>債務</h2>
 				<table class="table table-responsive">
 					<thead class=" thead-light">
@@ -33,7 +33,8 @@
 							<th>項目</th>
 							<th>金額</th>
 							<th>剩餘</th>
-							<th>結清</th>
+							<th>分配</th>
+							<th>狀態</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -42,11 +43,16 @@
 								<td>{{ debt.name }}</td>
 								<td>{{ debt.value }}</td>
 								<td>{{ debt.remain }}</td>
+								<td>{{ debt.is_distributed}}</td>
+								<form action="pay_debt" method="get">
+									<input type="hidden" name="Budget_name" value={{budget.name}}>
+									<input type="hidden" name="Debt_name" value={{debt.name}}>
 								{% if not debt.is_paid %}
-									<td style="color:red">{{ debt.is_paid }}</td>
+									<td><button class="btn btn-danger" type="submit" value="pay_debt">尚未結清</button></td>
 								{% else %}
-									<td>{{ debt.is_paid }}</td>
+									<td><button class="btn btn-primary disabled" type="button">結清</button></td>
 								{% endif %}
+								</form>
 
 							</tr>
 						{% endfor%}
@@ -136,10 +142,19 @@
 							<td>{{ LC.remain }}</td>
 						</tr>
 						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<div class="col-xs-2 col-md-auto category">
+				<h2>分類</h2>
+				<table class="table table-responsive">
+					<thead class="thead-light">
 						<tr>
 							<th> 分類 </th>
 							<th> 總花費 </th>
 						</tr>
+					</thead>
+					<tbody>
 						{% for c_name, value in CHOICES.items %}
 						<tr>
 							<td> {{ c_name }} </td>
@@ -151,7 +166,7 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-xs-6 col-lg-auto">
+			<div class="col-xs-6 col-md-5">
 				<h2> 收入 </h2>
 				<table class="table table-responsive">
 					<thead class="thead-light">
@@ -227,7 +242,7 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="col-xs-6 col-lg-auto">
+			<div class="col-xs-6 col-md-5">
 				<h2> 支出 </h2>
 				<table class="table table-responsive">
 					<thead class="thead-light">

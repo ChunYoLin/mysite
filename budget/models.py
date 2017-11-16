@@ -13,6 +13,7 @@ class Budget(model_base):
 
 class Debt(model_base):
     remain = models.IntegerField(default=0)
+    is_distributed = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     expenses = GenericRelation("Expenses")
     budget = models.ForeignKey(
