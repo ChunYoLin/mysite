@@ -155,7 +155,10 @@ class BudgetView(generic.DetailView):
         bank.save()
         LC.remain -= int(value)
         LC.save()
-        expense = Expenses(name=name, value=value, date=date, bank=bank, category=Category_name, budget=budget)
+        for k, v in dict(CHOICES).items():
+            if v == Category_name:
+                category = k
+        expense = Expenses(name=name, value=value, date=date, bank=bank, category=category, budget=budget)
         expense.save() 
         return HttpResponseRedirect('/budget/{}/{}'.format(Year_name, Budget_id)) 
 
