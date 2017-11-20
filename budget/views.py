@@ -49,13 +49,11 @@ class BudgetView(generic.DetailView):
         budget = kwargs['object']
         context = super(BudgetView, self).get_context_data(**kwargs)
         Year_name = self.kwargs['Year_name']
-        year = Year.objects.get(name=Year_name)
-        self.year = year
-        context["year"] = year
+        context["year"] = Year.objects.get(name=Year_name)
         context["Bank"] = Bank.objects.all()
         context["Deposit"] = budget.deposit_set.all()
-        context["BackupCost"] = budget.backupcost_set.all()
-        context["LivingCost"] = budget.livingcost_set.all()
+        context["BackupCost"] = budget.livingcost_set.get(name="備用")
+        context["LivingCost"] = budget.livingcost_set.get(name="生活/娛樂費")
         context["Incomes"] = budget.incomes_set.all().order_by('date')
         context["Expenses"] = budget.expenses_set.all().order_by('date')
         choices = OrderedDict()
@@ -133,7 +131,7 @@ class BudgetView(generic.DetailView):
         LC.save()
 
         ratio = 0.1
-        BC = BackupCost.objects.get_or_create(name="備用", ratio=ratio, budget=budget)[0]
+        BC = LivingCost.objects.get_or_create(name="備用", ratio=ratio, budget=budget)[0]
         BC.update()
         BC.save()
 
@@ -154,7 +152,7 @@ class BudgetView(generic.DetailView):
         bank.save()
         LC.remain -= int(value)
         if LC.remain < 0:
-            BC = BackupCost.objects.get(name="備用", budget=budget)
+            BC = LivingCost.objects.get(name="備用", budget=budget)
             BC.remain += LC.remain
             LC.remain = 0
         BC.save()

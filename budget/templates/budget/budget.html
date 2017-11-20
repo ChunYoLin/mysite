@@ -102,27 +102,6 @@
 				</table>
 			</div>
 			<div class="col-xs-3 col-md-auto">
-				<h2>備用</h2>
-				<table class="table table-responsive">
-					<thead class="thead-light">
-						<tr>
-							<th> 名稱 </th>
-							<th> 預算 </th>
-							<th> 剩餘 </th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for BC in BackupCost%}
-						<tr>
-							<td>{{ BC.name }}</td>
-							<td>{{ BC.value }}</td>
-							<td>{{ BC.remain }}</td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			</div>
-			<div class="col-xs-3 col-md-auto">
 				<h2>生活預算</h2>
 				<table class="table table-responsive">
 					<thead class="thead-light">
@@ -133,13 +112,30 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for LC in LivingCost%}
 						<tr>
-							<td>{{ LC.name }}</td>
-							<td>{{ LC.value }}</td>
-							<td>{{ LC.remain }}</td>
+							<td>{{ LivingCost.name }}</td>
+							<td>{{ LivingCost.value }}</td>
+							<td>{{ LivingCost.remain }}</td>
 						</tr>
-						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<div class="col-xs-3 col-md-auto">
+				<h2>備用</h2>
+				<table class="table table-responsive">
+					<thead class="thead-light">
+						<tr>
+							<th> 名稱 </th>
+							<th> 預算 </th>
+							<th> 剩餘 </th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>{{ BackupCost.name }}</td>
+							<td>{{ BackupCost.value }}</td>
+							<td>{{ BackupCost.remain }}</td>
+						</tr>
 					</tbody>
 				</table>
 			</div>

@@ -12,6 +12,9 @@ class model_base(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def update(self):
+        pass
 
     class Meta:
         abstract=True
