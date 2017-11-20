@@ -44,9 +44,6 @@ class BudgetView(generic.DetailView):
     model = Budget
     template_name = 'budget/budget.html'
     pk_url_kwarg = "Budget_id"
-    choices = OrderedDict()
-    for c_id, c_name in CHOICES:
-        choices[c_name] = 0
 
     def get_context_data(self, **kwargs):
         budget = kwargs['object']
@@ -61,10 +58,12 @@ class BudgetView(generic.DetailView):
         context["LivingCost"] = budget.livingcost_set.all()
         context["Incomes"] = budget.incomes_set.all().order_by('date')
         context["Expenses"] = budget.expenses_set.all().order_by('date')
+        choices = OrderedDict()
         for c_id, c_name in CHOICES:
+            choices[c_name] = 0
             for e in budget.expenses_set.filter(category=c_id):
-                self.choices[c_name] += e.value
-        context["CHOICES"] = self.choices
+                choices[c_name] += e.value
+        context["CHOICES"] = choices
         
         return context
     
@@ -154,6 +153,11 @@ class BudgetView(generic.DetailView):
         bank.value -= int(value)
         bank.save()
         LC.remain -= int(value)
+        if LC.remain < 0:
+            BC = BackupCost.objects.get(name="備用", budget=budget)
+            BC.remain += LC.remain
+            LC.remain = 0
+        BC.save()
         LC.save()
         for k, v in dict(CHOICES).items():
             if v == Category_name:
