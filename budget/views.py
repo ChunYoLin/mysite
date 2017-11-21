@@ -148,11 +148,11 @@ class BudgetView(generic.DetailView):
         bank = Bank.objects.get(name=Bank_name)
         budget = Budget.objects.get(id=Budget_id)
         LC = LivingCost.objects.get(name="生活/娛樂費", budget=budget)
+        BC = LivingCost.objects.get(name="備用", budget=budget)
         bank.value -= int(value)
         bank.save()
         LC.remain -= int(value)
         if LC.remain < 0:
-            BC = LivingCost.objects.get(name="備用", budget=budget)
             BC.remain += LC.remain
             LC.remain = 0
         BC.save()
