@@ -6,6 +6,7 @@
 
 		<!-- Bootstrap CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
 		<!-- w3c CSS -->
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<!-- Optional JavaScript -->
@@ -139,25 +140,6 @@
 					</tbody>
 				</table>
 			</div>
-			<div class="col-xs-2 col-md-auto category">
-				<h2>分類</h2>
-				<table class="table table-responsive">
-					<thead class="thead-light">
-						<tr>
-							<th> 分類 </th>
-							<th> 總花費 </th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for c_name, value in CHOICES.items %}
-						<tr>
-							<td> {{ c_name }} </td>
-							<td> {{ value }} </td>
-						</tr>
-						{% endfor %}
-					</tbody>
-				</table>
-			</div>
 		</div>
 		<div class="row">
 			<div class="col-xs-6 col-md-5">
@@ -238,72 +220,86 @@
 			</div>
 			<div class="col-xs-6 col-md-6">
 				<h2> 支出 </h2>
-				<table class="table table-responsive">
-					<thead class="thead-light">
-						<tr>
-							<th> 日期 </th>
-							<th> 名稱 </th>
-							<th> 金額 </th>
-							<th> 所屬資產 </th>
-							<th> 分類 </th>
-							<th></th>
-						</tr>
-					</thead>	
-					<tbody>
-						{% for expense in Expenses %}
-							<tr>
-								<td>{{ expense.date }}</td>
-								<td>{{ expense.name }}</td>
-								<td>{{ expense.value }}</td>
-								<td>{{ expense.bank }}</td>
-								<td>{{ expense.get_category_display }}</td>
-								<td></td>
-							</tr>
-						{% endfor %}
-						<form action="add_expense" method="get" >
-							<tr>
-								<td>
-									<input class="form-control" type="date" name="date" id=theDate1>
-									<script>
-										var date = new Date();
-										var day = date.getDate();
-										var month = date.getMonth() + 1;
-										var year = date.getFullYear();
-										if (month < 10) month = "0" + month;
-										if (day < 10) day = "0" + day;
-										var today = year + "-" + month + "-" + day;       
-										document.getElementById("theDate1").value = today;
-									</script>
-								</td>
-								<td>
-									<input class="form-control" type="text" name="name" >
-								</td>
-								<td>
-									<input class="form-control" type="number" name="value" >
-								</td>
-								<td>
-									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Bank_name">
-										<option selected>Choose...</option>
-										{% for bank in Bank %}
-											<option>{{ bank.name }}</option>
+				{% for c_name, value in CHOICES.items %}
+				<div class="panel-group" id="accordion">
+					<div class="panel panel-primary">
+						<div class="panel-heading" role="tab" id="heading{{forloop.counter}}">
+							<h4 class="panel-title">
+								<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}">
+									<tr>
+										<td>{{c_name}}</td>
+										<td>{{value}}</td>
+									</tr>
+								</a>
+							</h4>
+						</div><!--/.panel-heading -->
+						<div id="collapse{{forloop.counter}}" class="panel-collapse collapse">
+							<div class="panel-body">
+								<table class="table table-responsive">
+									<thead "thead-light">
+										<tr>
+											<th> 日期 </th>
+											<th> 名稱 </th>
+											<th> 金額 </th>
+											<th> 所屬資產 </th>
+											<th> 分類 </th>
+											<th></th>
+										</tr>
+									</thead>	
+									<tbody>
+										{% for expense in Expenses %}
+										{% if expense.get_category_display == c_name%}
+										<tr>
+											<td>{{ expense.date }}</td>
+											<td>{{ expense.name }}</td>
+											<td>{{ expense.value }}</td>
+											<td>{{ expense.bank }}</td>
+											<td>{{ expense.get_category_display }}</td>
+											<td></td>
+										</tr>
+										{% endif %}
 										{% endfor %}
-									</select>
-								</td>
-								<td>
-									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Category_name">
-										<option selected>Choose...</option>
-										{% for c_name, value in CHOICES.items %}
-											<option>{{ c_name }}</option>
-										{% endfor %}
-									</select>
-								</td>
-								<td>
-									<button class="btn btn-primary" type="submit">submit</button>
-								</td>
-							</tr>
-						</form>
-					</tbody>
-				</table>
+										<form action="add_expense" method="get" >
+											<tr>
+												<td>
+													<input class="form-control" type="date" name="date" id=theDate{{forloop.counter}}>
+													<script>
+														var date = new Date();
+														var day = date.getDate();
+														var month = date.getMonth() + 1;
+														var year = date.getFullYear();
+														if (month < 10) month = "0" + month;
+														if (day < 10) day = "0" + day;
+														var today = year + "-" + month + "-" + day;       
+														document.getElementById("theDate{{forloop.counter}}").value = today;
+													</script>
+												</td>
+												<td>
+													<input class="form-control" type="text" name="name" >
+												</td>
+												<td>
+													<input class="form-control" type="number" name="value" >
+												</td>
+												<td>
+													<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Bank_name">
+														<option selected>Choose...</option>
+														{% for bank in Bank %}
+														<option>{{ bank.name }}</option>
+														{% endfor %}
+													</select>
+												</td>
+												<td>
+													<button class="btn btn-primary" type="submit">submit</button>
+												</td>
+											</tr>
+										</form>
+									</tbody>
+								</table>
+							</div><!--/.panel-body -->
+						</div><!--/.panel-collapse -->
+					</div><!-- /.panel -->
+				</div><!-- /.panel-group -->
+				{% endfor %}
 			</div>
 		</div>
 	</body>
