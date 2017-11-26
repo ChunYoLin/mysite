@@ -9,11 +9,10 @@ BC = LivingCost.objects.get(name="備用", budget=budget)
 #  for ex in Expenses.objects.filter(date__range=[datetime.datetime(2017,11,20), datetime.datetime(2017,11,23)], budget=budget):
     #  ex.belong_to = BC
     #  ex.save()
-LC.update()
-LC.save()
-BC.update()
-BC.save()
 
+for ex in Expenses.objects.all():
+    ex.is_fulfill = True
+    ex.save()
 #  print(LC[0].value)
 #  LC[0].save()
 #  LC = LivingCost.objects.get(budget=budget)

@@ -26,6 +26,7 @@ CHOICES = (
     ("Transportation", "行"),
     ("Education", "育"),
     ("Entertainment", "樂"),
+    ("Others", "其他"),
 )
 
 class Category(models.Model):

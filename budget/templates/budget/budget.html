@@ -26,7 +26,7 @@
 		</div>
 		<h1>{{ budget.name }}份預算表</h1>
 		<div class="row">
-			<div class="col-sm-4 col-md-3">
+			<div class="col-sm-4 col-md-4">
 				<h2>債務</h2>
 				<table class="table table-responsive">
 					<thead class=" thead-light">
@@ -34,6 +34,7 @@
 							<th>項目</th>
 							<th>金額</th>
 							<th>剩餘</th>
+							<th>分類</th>
 							<th>分配</th>
 							<th>狀態</th>
 						</tr>
@@ -44,9 +45,10 @@
 								<td>{{ debt.name }}</td>
 								<td>{{ debt.value }}</td>
 								<td>{{ debt.remain }}</td>
+								<td>{{ debt.get_category_display }}</td>
 								<td>{{ debt.is_distributed}}</td>
 								<form action="pay_debt" method="get">
-									<input type="hidden" name="Debt_name" value={{debt.name}}>
+									<input type="hidden" name="Debt_id" value={{debt.id}}>
 								{% if not debt.is_paid %}
 									<td><button class="btn btn-danger" type="submit" value="pay_debt">尚未結清</button></td>
 								{% else %}
@@ -63,6 +65,14 @@
 								</td>
 								<td class>
 									<input class="form-control"  type="number" name="value">
+								</td>
+								<td>
+									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Category_name">
+										<option selected>Choose...</option>
+										{% for c_name, value in CHOICES.items %}
+											<option>{{ c_name }}</option>
+										{% endfor %}
+									</select>
 								</td>
 								<td>
 									<button class="btn btn-primary" type="submit">submit</button>
@@ -238,16 +248,18 @@
 									</thead>	
 									<tbody>
 										{% for expense in Expenses %}
-										{% if expense.get_category_display == c_name%}
-										<tr>
-											<td>{{ expense.date }}</td>
-											<td>{{ expense.name }}</td>
-											<td>{{ expense.value }}</td>
-											<td>{{ expense.bank }}</td>
-											<td>{{ expense.get_category_display }}</td>
-											<td></td>
-										</tr>
-										{% endif %}
+											{% if expense.is_fulfill == True %}
+												{% if expense.get_category_display == c_name %}
+												<tr>
+													<td>{{ expense.date }}</td>
+													<td>{{ expense.name }}</td>
+													<td>{{ expense.value }}</td>
+													<td>{{ expense.bank }}</td>
+													<td>{{ expense.get_category_display }}</td>
+													<td></td>
+												</tr>
+												{% endif %}
+											{% endif %}
 										{% endfor %}
 										<form action="add_expense" method="get" >
 											<tr>

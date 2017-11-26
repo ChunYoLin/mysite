@@ -22,7 +22,7 @@ class Budget(model_base):
             null=True
     )
 
-class Debt(model_base):
+class Debt(model_base, Category):
     remain = models.IntegerField(default=0)
     is_distributed = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
@@ -98,6 +98,7 @@ class Expenses(model_base, Category):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
     object_id = models.PositiveIntegerField(null=True)
     belong_to = GenericForeignKey('content_type', 'object_id')
+    is_fulfill = models.BooleanField(default=False)
     budget = models.ForeignKey(
         'Budget',
         on_delete=models.CASCADE,

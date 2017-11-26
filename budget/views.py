@@ -60,7 +60,7 @@ class BudgetView(generic.DetailView):
         choices = OrderedDict()
         for c_id, c_name in CHOICES:
             choices[c_name] = 0
-            for e in budget.expenses_set.filter(category=c_id):
+            for e in budget.expenses_set.filter(category=c_id, is_fulfill=True):
                 choices[c_name] += e.value
         context["CHOICES"] = choices
         context["Today"] = date.today()
@@ -71,18 +71,25 @@ class BudgetView(generic.DetailView):
         
         Debt_name = self.GET["Debt_name"]
         value = self.GET["value"]
+        Category_name = self.GET["Category_name"]
         
         B = Budget.objects.get(id=Budget_id)
-        debt = Debt(name=Debt_name, value=value, remain=value, budget=B)
+        for k, v in dict(CHOICES).items():
+            if v == Category_name:
+                category = k
+        debt = Debt(name=Debt_name, value=value, remain=value, budget=B, category=category)
         debt.save()
         return HttpResponseRedirect('/budget/{}/{}'.format(Year_name, Budget_id)) 
     
     def pay_debt(self, Year_name, Budget_id):
 
-        Debt_name = self.GET["Debt_name"]
-        B = Budget.objects.get(id=Budget_id)
-        debt = Debt.objects.get(name=Debt_name, budget=B)
+        Debt_id = self.GET["Debt_id"]
+        budget = Budget.objects.get(id=Budget_id)
+        debt = Debt.objects.get(id=Debt_id, budget=budget)
         debt.is_paid = True
+        for ex in debt.expenses.all():
+            ex.is_fulfill = True
+            ex.save()
         debt.save()
         return HttpResponseRedirect('/budget/{}/{}'.format(Year_name, Budget_id)) 
 
@@ -101,10 +108,12 @@ class BudgetView(generic.DetailView):
         Bank_name = self.GET["Bank_name"]
 
         budget = Budget.objects.get(id=Budget_id)
+        bank = Bank.objects.get(name=Bank_name)
+
         value = int(value.replace(',', ''))
         income_remain = value
         
-        for debt in Debt.objects.all():
+        for debt in Debt.objects.filter(budget=budget):
             if not debt.is_paid:
                 if debt.remain > income_remain:
                     debt.remain -= income_remain
@@ -113,9 +122,11 @@ class BudgetView(generic.DetailView):
                     income_remain -= debt.remain
                     debt.remain = 0
                     debt.is_distributed = True
+                belong_to = debt
+                expense = Expenses(name=name, value=value, date=date, bank=bank, belong_to=belong_to, category=debt.category, budget=budget, is_fulfill=False)
                 debt.save()
+                expense.save() 
 
-        bank = Bank.objects.get(name=Bank_name)
         bank.value += income_remain
         bank.save()
         
@@ -162,7 +173,7 @@ class BudgetView(generic.DetailView):
         for k, v in dict(CHOICES).items():
             if v == Category_name:
                 category = k
-        expense = Expenses(name=name, value=value, date=date, bank=bank, belong_to=belong_to, category=category, budget=budget)
+        expense = Expenses(name=name, value=value, date=date, bank=bank, belong_to=belong_to, category=category, budget=budget, is_fulfill=True)
         expense.save() 
         BC.update()
         LC.update()
