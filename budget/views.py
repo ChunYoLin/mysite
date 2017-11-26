@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.template.defaulttags import register
 
 from collections import OrderedDict
+from datetime import date
 
 from .base import *
 from .models import *
@@ -62,6 +63,7 @@ class BudgetView(generic.DetailView):
             for e in budget.expenses_set.filter(category=c_id):
                 choices[c_name] += e.value
         context["CHOICES"] = choices
+        context["Today"] = date.today()
         
         return context
     
@@ -140,7 +142,7 @@ class BudgetView(generic.DetailView):
     def add_expense(self, Year_name, Budget_id):
         
         name = self.GET["name"] 
-        value = self.GET["value"]
+        value = int(self.GET["value"])
         date = self.GET["date"]
         Bank_name = self.GET["Bank_name"]
         Category_name = self.GET["Category_name"]
@@ -149,19 +151,23 @@ class BudgetView(generic.DetailView):
         budget = Budget.objects.get(id=Budget_id)
         LC = LivingCost.objects.get(name="生活/娛樂費", budget=budget)
         BC = LivingCost.objects.get(name="備用", budget=budget)
-        bank.value -= int(value)
+        bank.value -= value
         bank.save()
-        LC.remain -= int(value)
-        if LC.remain < 0:
-            BC.remain += LC.remain
-            LC.remain = 0
-        BC.save()
-        LC.save()
+        if(LC.remain >= value):
+            belong_to = LC
+            LC.remain -= value
+        else:
+            belong_to = BC
+            BC.remain -= value
         for k, v in dict(CHOICES).items():
             if v == Category_name:
                 category = k
-        expense = Expenses(name=name, value=value, date=date, bank=bank, category=category, budget=budget)
+        expense = Expenses(name=name, value=value, date=date, bank=bank, belong_to=belong_to, category=category, budget=budget)
         expense.save() 
+        BC.update()
+        LC.update()
+        BC.save()
+        LC.save()
         return HttpResponseRedirect('/budget/{}/{}'.format(Year_name, Budget_id)) 
 
 def asset_transfer(request):

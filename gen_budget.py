@@ -2,13 +2,18 @@ from budget.models import *
 import datetime
 months = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
 
-for y in range(2018, 2020):
-    year = Year(name=y)
-    year.save()
-    for m in months:
-        B = Budget(name=m)
-        B.year=year
-        B.save()
+year = Year.objects.get(name=2017)
+budget = Budget.objects.get(name="十一月", year=year)
+LC = LivingCost.objects.get(name="生活/娛樂費", budget=budget)
+BC = LivingCost.objects.get(name="備用", budget=budget)
+#  for ex in Expenses.objects.filter(date__range=[datetime.datetime(2017,11,20), datetime.datetime(2017,11,23)], budget=budget):
+    #  ex.belong_to = BC
+    #  ex.save()
+LC.update()
+LC.save()
+BC.update()
+BC.save()
+
 #  print(LC[0].value)
 #  LC[0].save()
 #  LC = LivingCost.objects.get(budget=budget)

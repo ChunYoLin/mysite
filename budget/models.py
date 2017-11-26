@@ -75,28 +75,6 @@ class LivingCost(model_base, budget_ratio):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-class BackupCost(model_base, budget_ratio):
-    expenses = GenericRelation("Expenses")
-    remain = models.IntegerField(default=0)
-    budget = models.ForeignKey(
-            'Budget',
-            on_delete=models.CASCADE,
-            null=True
-    )
-
-    def update(self, *args, **kwargs):
-        self.value = 0
-        for i in self.budget.incomes_set.all():
-            self.value += i.remain 
-        self.value *= self.ratio
-        self.value = int(self.value)
-        self.remain = self.value
-        for ex in self.expenses.all():
-            self.remain -= ex.value
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
 class Bank(model_base):
     pass
 
