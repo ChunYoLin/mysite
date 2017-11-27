@@ -1,0 +1,54 @@
+<h2>債務</h2>
+<table class="table table-responsive">
+	<thead class=" thead-light">
+		<tr>
+			<th>項目</th>
+			<th>金額</th>
+			<th>剩餘</th>
+			<th>分類</th>
+			<th>分配</th>
+			<th>狀態</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for debt in budget.debt_set.all %}
+		<tr>
+			<td>{{ debt.name }}</td>
+			<td>{{ debt.value }}</td>
+			<td>{{ debt.remain }}</td>
+			<td>{{ debt.get_category_display }}</td>
+			<td>{{ debt.is_distributed}}</td>
+			<form action="pay_debt" method="get">
+				<input type="hidden" name="Debt_id" value={{debt.id}}>
+				{% if not debt.is_paid %}
+				<td><button class="btn btn-danger" type="submit" value="pay_debt">尚未結清</button></td>
+				{% else %}
+				<td><button class="btn btn-primary disabled" type="button">結清</button></td>
+				{% endif %}
+			</form>
+
+		</tr>
+		{% endfor%}
+		<form action="add_debt" method="get">
+			<tr>
+				<td>
+					<input class="form-control" type="text" name="Debt_name">
+				</td>
+				<td class>
+					<input class="form-control"  type="number" name="value">
+				</td>
+				<td>
+					<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Category_name">
+						<option selected>Choose...</option>
+						{% for c_name, value in CHOICES.items %}
+						<option>{{ c_name }}</option>
+						{% endfor %}
+					</select>
+				</td>
+				<td>
+					<button class="btn btn-primary" type="submit">submit</button>
+				</td>
+			</tr>
+		</form>
+	</tbody>
+</table>

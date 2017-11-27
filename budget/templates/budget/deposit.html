@@ -1,0 +1,28 @@
+<h2>存款</h2>
+<table class="table table-responsive">
+	<thead class="thead-light">
+		<tr>
+			<th> 名稱 </th>
+			<th> 金額 </th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for deposit in Deposit %}
+		<tr>
+			<td>{{ deposit.name }}</td>
+			<td>{{ deposit.value }}</td>
+		</tr>
+		{% endfor %}
+		<tr>
+			<td>總和</td>
+			<td id="total_DEPOSIT"></td>
+			<script>
+				var total_deposit = 0
+{% for deposit in Deposit %}
+total_deposit += {{ deposit.value }};
+{% endfor %}
+document.getElementById("total_DEPOSIT").innerHTML = total_deposit;
+			</script>
+		</tr>
+	</tbody>
+</table>

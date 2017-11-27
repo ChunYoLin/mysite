@@ -1,0 +1,73 @@
+{% for c_name, value in CHOICES.items %}
+<div class="panel-group" id="accordion">
+	<div class="panel panel-primary">
+		<div class="panel-heading" role="tab" id="heading{{forloop.counter}}">
+			<h4 class="panel-title">
+				<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}">
+					<tr>
+						<td>{{c_name}}</td>
+						<td>{{value}}</td>
+					</tr>
+				</a>
+			</h4>
+		</div><!--/.panel-heading -->
+		<div id="collapse{{forloop.counter}}" class="panel-collapse collapse">
+			<div class="panel-body">
+				<table class="table table-responsive">
+					<thead "thead-light">
+						<tr>
+							<th> 日期 </th>
+							<th> 名稱 </th>
+							<th> 金額 </th>
+							<th> 所屬資產 </th>
+							<th> 分類 </th>
+							<th></th>
+						</tr>
+					</thead>	
+					<tbody>
+						{% for expense in Expenses %}
+						{% if expense.is_fulfill == True %}
+						{% if expense.get_category_display == c_name %}
+						<tr>
+							<td>{{ expense.date }}</td>
+							<td>{{ expense.name }}</td>
+							<td>{{ expense.value }}</td>
+							<td>{{ expense.bank }}</td>
+							<td>{{ expense.get_category_display }}</td>
+							<td></td>
+						</tr>
+						{% endif %}
+						{% endif %}
+						{% endfor %}
+						<form action="add_expense" method="get" >
+							<tr>
+								<td>
+									<input class="form-control" type="date" name="date" value="{{Today|date:'Y-m-d'}}">
+									<input type="hidden" name="Category_name" value={{c_name}}>
+								</td>
+								<td>
+									<input class="form-control" type="text" name="name" >
+								</td>
+								<td>
+									<input class="form-control" type="number" name="value" >
+								</td>
+								<td>
+									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Bank_name">
+										<option selected>Choose...</option>
+										{% for bank in Bank %}
+										<option>{{ bank.name }}</option>
+										{% endfor %}
+									</select>
+								</td>
+								<td>
+									<button class="btn btn-primary" type="submit">submit</button>
+								</td>
+							</tr>
+						</form>
+					</tbody>
+				</table>
+			</div><!--/.panel-body -->
+		</div><!--/.panel-collapse -->
+	</div><!-- /.panel -->
+</div><!-- /.panel-group -->
+{% endfor %}

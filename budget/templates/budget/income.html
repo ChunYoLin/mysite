@@ -1,0 +1,64 @@
+<h2> 收入 </h2>
+<table class="table table-responsive">
+	<thead class="thead-light">
+		<tr>
+			<th> 日期 </th>
+			<th> 名稱 </th>
+			<th> 金額 </th>
+			<th> 所屬資產 </th>
+			<th> 扣除債務 </th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for Income in Incomes %}
+		<tr>
+			<td>{{ Income.date }}</td>
+			<td>{{ Income.name }}</td>
+			<td>{{ Income.value }}</td>
+			<td>{{ Income.bank }}</td>
+			<td>{{ Income.remain }}</td>
+		</tr>
+		{% endfor %}
+		<tr>
+			<td></td>
+			<td>總和</td>
+			<td id=total_income></td>
+			<td></td>
+			<td id=total_income_remain></td>
+			<script>
+				var total_income = 0
+				var total_income_remain = 0
+{% for income in Incomes %}
+total_income += {{ income.value }};
+total_income_remain += {{ income.remain }};
+{% endfor %}
+document.getElementById("total_income").innerHTML = total_income;
+document.getElementById("total_income_remain").innerHTML = total_income_remain;
+			</script>
+		</tr>
+		<form action="add_income" method="get" >
+			<tr>
+				<td>
+					<input class="form-control" type="date" name="date" value="{{Today|date:'Y-m-d'}}">
+				</td>
+				<td>
+					<input class="form-control" type="text" name="name">
+				</td>
+				<td>
+					<input class="form-control" type="number" name="value">
+				</td>
+				<td>
+					<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Bank_name">
+						<option selected>Choose...</option>
+						{% for bank in Bank %}
+						<option>{{ bank.name }}</option>
+						{% endfor %}
+					</select>
+				</td>
+				<td>
+					<button  class="btn btn-primary" type="submit">submit</button>
+				</td>
+			</tr>
+		</form>
+	</tbody>
+</table>

@@ -16,7 +16,7 @@
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 
 		{% load static %}
-		<link rel="stylesheet" type="text/css" href={% static "budget/css/detail.css"%}>
+		<link rel="stylesheet" type="text/css" href={% static "budget/css/budget.css"%}>
 		<title>{{ budget.name }}</title>
 		<meta charset='utf-8'>
 	</head>
@@ -27,273 +27,40 @@
 		<h1>{{ budget.name }}份預算表</h1>
 		<div class="row">
 			<div class="col-sm-4 col-md-4">
-				<h2>債務</h2>
-				<table class="table table-responsive">
-					<thead class=" thead-light">
-						<tr>
-							<th>項目</th>
-							<th>金額</th>
-							<th>剩餘</th>
-							<th>分類</th>
-							<th>分配</th>
-							<th>狀態</th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for debt in budget.debt_set.all %}
-							<tr>
-								<td>{{ debt.name }}</td>
-								<td>{{ debt.value }}</td>
-								<td>{{ debt.remain }}</td>
-								<td>{{ debt.get_category_display }}</td>
-								<td>{{ debt.is_distributed}}</td>
-								<form action="pay_debt" method="get">
-									<input type="hidden" name="Debt_id" value={{debt.id}}>
-								{% if not debt.is_paid %}
-									<td><button class="btn btn-danger" type="submit" value="pay_debt">尚未結清</button></td>
-								{% else %}
-									<td><button class="btn btn-primary disabled" type="button">結清</button></td>
-								{% endif %}
-								</form>
-
-							</tr>
-						{% endfor%}
-						<form action="add_debt" method="get">
-							<tr>
-								<td>
-									<input class="form-control" type="text" name="Debt_name">
-								</td>
-								<td class>
-									<input class="form-control"  type="number" name="value">
-								</td>
-								<td>
-									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Category_name">
-										<option selected>Choose...</option>
-										{% for c_name, value in CHOICES.items %}
-											<option>{{ c_name }}</option>
-										{% endfor %}
-									</select>
-								</td>
-								<td>
-									<button class="btn btn-primary" type="submit">submit</button>
-								</td>
-							</tr>
-						</form>
-					</tbody>
-				</table>
+				{% include 'budget/debt.html' %}
 			</div>
 			<div class="col-xs-2 col-md-auto">
-				<h2>存款</h2>
-				<table class="table table-responsive">
-					<thead class="thead-light">
-						<tr>
-							<th> 名稱 </th>
-							<th> 金額 </th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for deposit in Deposit %}
-							<tr>
-								<td>{{ deposit.name }}</td>
-								<td>{{ deposit.value }}</td>
-							</tr>
-						{% endfor %}
-						<tr>
-							<td>總和</td>
-							<td id="total_DEPOSIT"></td>
-							<script>
-									var total_deposit = 0
-									{% for deposit in Deposit %}
-										total_deposit += {{ deposit.value }};
-									{% endfor %}
-									document.getElementById("total_DEPOSIT").innerHTML = total_deposit;
-							</script>
-						</tr>
-					</tbody>
-				</table>
+				{% include 'budget/deposit.html' %}
 			</div>
 			<div class="col-xs-3 col-md-auto">
-				<h2>生活預算</h2>
-				<table class="table table-responsive">
-					<thead class="thead-light">
-						<tr>
-							<th> 名稱 </th>
-							<th> 預算 </th>
-							<th> 剩餘 </th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>{{ LivingCost.name }}</td>
-							<td>{{ LivingCost.value }}</td>
-							<td>{{ LivingCost.remain }}</td>
-						</tr>
-					</tbody>
-				</table>
+				{% include 'budget/livingcost.html' %}
 			</div>
 			<div class="col-xs-3 col-md-auto">
-				<h2>備用</h2>
-				<table class="table table-responsive">
-					<thead class="thead-light">
-						<tr>
-							<th> 名稱 </th>
-							<th> 預算 </th>
-							<th> 剩餘 </th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>{{ BackupCost.name }}</td>
-							<td>{{ BackupCost.value }}</td>
-							<td>{{ BackupCost.remain }}</td>
-						</tr>
-					</tbody>
-				</table>
+				{% include 'budget/backupcost.html' %}
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-xs-6 col-md-5">
-				<h2> 收入 </h2>
-				<table class="table table-responsive">
-					<thead class="thead-light">
-						<tr>
-							<th> 日期 </th>
-							<th> 名稱 </th>
-							<th> 金額 </th>
-							<th> 所屬資產 </th>
-							<th> 扣除債務 </th>
-						</tr>
-					</thead>
-					<tbody>
-						{% for Income in Incomes %}
-							<tr>
-								<td>{{ Income.date }}</td>
-								<td>{{ Income.name }}</td>
-								<td>{{ Income.value }}</td>
-								<td>{{ Income.bank }}</td>
-								<td>{{ Income.remain }}</td>
-							</tr>
-						{% endfor %}
-						<tr>
-							<td></td>
-							<td>總和</td>
-							<td id=total_income></td>
-							<td></td>
-							<td id=total_income_remain></td>
-							<script>
-									var total_income = 0
-									var total_income_remain = 0
-									{% for income in Incomes %}
-										total_income += {{ income.value }};
-										total_income_remain += {{ income.remain }};
-									{% endfor %}
-									document.getElementById("total_income").innerHTML = total_income;
-									document.getElementById("total_income_remain").innerHTML = total_income_remain;
-							</script>
-						</tr>
-						<form action="add_income" method="get" >
-							<tr>
-								<td>
-									<input class="form-control" type="date" name="date" value="{{Today|date:'Y-m-d'}}">
-								</td>
-								<td>
-									<input class="form-control" type="text" name="name">
-								</td>
-								<td>
-									<input class="form-control" type="number" name="value">
-								</td>
-								<td>
-									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Bank_name">
-										<option selected>Choose...</option>
-										{% for bank in Bank %}
-											<option>{{ bank.name }}</option>
-										{% endfor %}
-									</select>
-								</td>
-								<td>
-									<button  class="btn btn-primary" type="submit">submit</button>
-								</td>
-							</tr>
-						</form>
-					</tbody>
-				</table>
+				{% include 'budget/income.html' %}
 			</div>
 			<div class="col-xs-6 col-md-6">
-				<h2> 支出 </h2>
-				{% for c_name, value in CHOICES.items %}
-				<div class="panel-group" id="accordion">
-					<div class="panel panel-primary">
-						<div class="panel-heading" role="tab" id="heading{{forloop.counter}}">
-							<h4 class="panel-title">
-								<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}">
-									<tr>
-										<td>{{c_name}}</td>
-										<td>{{value}}</td>
-									</tr>
-								</a>
-							</h4>
-						</div><!--/.panel-heading -->
-						<div id="collapse{{forloop.counter}}" class="panel-collapse collapse">
-							<div class="panel-body">
-								<table class="table table-responsive">
-									<thead "thead-light">
-										<tr>
-											<th> 日期 </th>
-											<th> 名稱 </th>
-											<th> 金額 </th>
-											<th> 所屬資產 </th>
-											<th> 分類 </th>
-											<th></th>
-										</tr>
-									</thead>	
-									<tbody>
-										{% for expense in Expenses %}
-											{% if expense.is_fulfill == True %}
-												{% if expense.get_category_display == c_name %}
-												<tr>
-													<td>{{ expense.date }}</td>
-													<td>{{ expense.name }}</td>
-													<td>{{ expense.value }}</td>
-													<td>{{ expense.bank }}</td>
-													<td>{{ expense.get_category_display }}</td>
-													<td></td>
-												</tr>
-												{% endif %}
-											{% endif %}
-										{% endfor %}
-										<form action="add_expense" method="get" >
-											<tr>
-												<td>
-													<input class="form-control" type="date" name="date" value="{{Today|date:'Y-m-d'}}">
-													<input type="hidden" name="Category_name" value={{c_name}}>
-												</td>
-												<td>
-													<input class="form-control" type="text" name="name" >
-												</td>
-												<td>
-													<input class="form-control" type="number" name="value" >
-												</td>
-												<td>
-													<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Bank_name">
-														<option selected>Choose...</option>
-														{% for bank in Bank %}
-														<option>{{ bank.name }}</option>
-														{% endfor %}
-													</select>
-												</td>
-												<td>
-													<button class="btn btn-primary" type="submit">submit</button>
-												</td>
-											</tr>
-										</form>
-									</tbody>
-								</table>
-							</div><!--/.panel-body -->
-						</div><!--/.panel-collapse -->
-					</div><!-- /.panel -->
-				</div><!-- /.panel-group -->
-				{% endfor %}
+			<h2>支出</h2>
+			<ul class="nav nav-tabs" id="myTab" role="tablist">
+				<li class="nav-item">
+					<a class="nav-link active" id="category-tab" data-toggle="tab" href="#category" role="tab" aria-controls="category" aria-selected="true">依分類</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" id="date-tab" data-toggle="tab" href="#date" role="tab" aria-controls="date" aria-selected="false">依日期</a>
+				</li>
+			</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="category" role="tabpanel" aria-labelledby="category-tab">
+						{% include 'budget/expenses.html' %}
+					</div>
+					<div class="tab-pane active" id="date" role="tabpanel" aria-labelledby="date-tab">
+					</div>
+				</div>
 			</div>
-		</div>
+		</div> 
 	</body>
 </html>

@@ -53,8 +53,16 @@ class BudgetView(generic.DetailView):
         context["year"] = Year.objects.get(name=Year_name)
         context["Bank"] = Bank.objects.all()
         context["Deposit"] = budget.deposit_set.all()
-        context["BackupCost"] = budget.livingcost_set.get(name="備用")
-        context["LivingCost"] = budget.livingcost_set.get(name="生活/娛樂費")
+        ratio = 0.3
+        context["LivingCost"] = LivingCost.objects.get_or_create(
+                name="生活/娛樂費", 
+                ratio=ratio, 
+                budget=budget)[0]
+        ratio = 0.1
+        context["BackupCost"] = LivingCost.objects.get_or_create(
+                name="備用", 
+                ratio=ratio, 
+                budget=budget)[0]
         context["Incomes"] = budget.incomes_set.all().order_by('date')
         context["Expenses"] = budget.expenses_set.all().order_by('date')
         choices = OrderedDict()
@@ -123,14 +131,28 @@ class BudgetView(generic.DetailView):
                     debt.remain = 0
                     debt.is_distributed = True
                 belong_to = debt
-                expense = Expenses(name=name, value=value, date=date, bank=bank, belong_to=belong_to, category=debt.category, budget=budget, is_fulfill=False)
+                expense = Expenses(
+                        name="償還_{}".format(name), 
+                        value=value, 
+                        date=date, 
+                        bank=bank, 
+                        belong_to=belong_to, 
+                        category=debt.category,
+                        budget=budget, 
+                        is_fulfill=False)
                 debt.save()
                 expense.save() 
 
         bank.value += income_remain
         bank.save()
         
-        income = Incomes(name=name, value=value, remain=income_remain, date=date, bank=bank, budget=budget)
+        income = Incomes(
+                name=name, 
+                value=value, 
+                remain=income_remain, 
+                date=date, 
+                bank=bank, 
+                budget=budget)
         income.save() 
 
         ratio = 0.6
@@ -138,13 +160,11 @@ class BudgetView(generic.DetailView):
         D.update()
         D.save()
 
-        ratio = 0.3
-        LC = LivingCost.objects.get_or_create(name="生活/娛樂費", ratio=ratio, budget=budget)[0]
+        LC = LivingCost.objects.get(name="生活/娛樂費", budget=budget)
         LC.update()
         LC.save()
 
-        ratio = 0.1
-        BC = LivingCost.objects.get_or_create(name="備用", ratio=ratio, budget=budget)[0]
+        BC = LivingCost.objects.get(name="備用", ratio=ratio, budget=budget)
         BC.update()
         BC.save()
 
@@ -173,7 +193,15 @@ class BudgetView(generic.DetailView):
         for k, v in dict(CHOICES).items():
             if v == Category_name:
                 category = k
-        expense = Expenses(name=name, value=value, date=date, bank=bank, belong_to=belong_to, category=category, budget=budget, is_fulfill=True)
+        expense = Expenses(
+                name=name, 
+                value=value, 
+                date=date, 
+                bank=bank, 
+                belong_to=belong_to, 
+                category=category, 
+                budget=budget, 
+                is_fulfill=True)
         expense.save() 
         BC.update()
         LC.update()
