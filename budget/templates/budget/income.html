@@ -28,12 +28,12 @@
 			<script>
 				var total_income = 0
 				var total_income_remain = 0
-{% for income in Incomes %}
-total_income += {{ income.value }};
-total_income_remain += {{ income.remain }};
-{% endfor %}
-document.getElementById("total_income").innerHTML = total_income;
-document.getElementById("total_income_remain").innerHTML = total_income_remain;
+				{% for income in Incomes %}
+				total_income += {{ income.value }};
+				total_income_remain += {{ income.remain }};
+				{% endfor %}
+				document.getElementById("total_income").innerHTML = total_income;
+				document.getElementById("total_income_remain").innerHTML = total_income_remain;
 			</script>
 		</tr>
 		<form action="add_income" method="get" >

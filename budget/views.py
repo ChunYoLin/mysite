@@ -124,16 +124,18 @@ class BudgetView(generic.DetailView):
         for debt in Debt.objects.filter(budget=budget):
             if not debt.is_paid:
                 if debt.remain > income_remain:
+                    ex_value = income_remain
                     debt.remain -= income_remain
                     remain = 0
                 else:
+                    ex_value = debt.remain
                     income_remain -= debt.remain
                     debt.remain = 0
                     debt.is_distributed = True
                 belong_to = debt
                 expense = Expenses(
-                        name="償還_{}".format(name), 
-                        value=value, 
+                        name="償還_{}".format(debt.name), 
+                        value=ex_value, 
                         date=date, 
                         bank=bank, 
                         belong_to=belong_to, 
@@ -164,7 +166,7 @@ class BudgetView(generic.DetailView):
         LC.update()
         LC.save()
 
-        BC = LivingCost.objects.get(name="備用", ratio=ratio, budget=budget)
+        BC = LivingCost.objects.get(name="備用" ,budget=budget)
         BC.update()
         BC.save()
 
