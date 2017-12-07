@@ -1,0 +1,82 @@
+{% for day in DAY_LIST %}
+<div class="panel-group" id="day_accordion">
+	<div class="panel panel-primary">
+		<div class="panel-heading" role="tab" id="day_heading{{forloop.counter}}">
+			<h4 class="panel-title">
+				<a id ="a_day_heading{{forloop.counter}}" data-toggle="collapse" data-parent="#day_accordion" href="#day_collapse{{forloop.counter}}">
+					{{day}}
+				</a>
+			</h4>
+		</div><!--/.panel-heading -->
+		<div id="day_collapse{{forloop.counter}}" class="panel-collapse collapse">
+			<div class="panel-body">
+				<table class="table table-responsive">
+					<thead "thead-light">
+						<tr>
+							<th> 分類 </th>
+							<th> 名稱 </th>
+							<th> 金額 </th>
+							<th> 所屬資產 </th>
+							<th></th>
+						</tr>
+					</thead>	
+					<tbody>
+						{% for expense in Expenses %}
+						{% if expense.is_fulfill == True %}
+						{% if expense.date == day %}
+						<tr>
+							<td>{{ expense.get_category_display }}</td>
+							<td>{{ expense.name }}</td>
+							<td>{{ expense.value }}</td>
+							<td>{{ expense.bank }}</td>
+							<td></td>
+						</tr>
+						{% endif %}
+						{% endif %}
+						{% endfor %}
+						<form action="add_expense" method="get" >
+							<tr>
+								<input type="hidden" name="date" value={{day|date:'Y-m-d'}}>
+								<td>
+									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Category_name">
+										<option selected>Choose...</option>
+										{% for c_name, value in CHOICES.items %}
+										<option>{{ c_name }}</option>
+										{% endfor %}
+									</select>
+								</td>
+								<td>
+									<input class="form-control" type="text" name="name" >
+								</td>
+								<td>
+									<input class="form-control" type="number" name="value" >
+								</td>
+								<td>
+									<select class="custom-select mb-2 mr-sm-2 mb-sm-0" name="Bank_name">
+										<option selected>Choose...</option>
+										{% for bank in Bank %}
+										<option>{{ bank.name }}</option>
+										{% endfor %}
+									</select>
+								</td>
+								<td>
+									<button class="btn btn-primary" type="submit">submit</button>
+								</td>
+							</tr>
+						</form>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<script>
+			document.getElementById("day_collapse3").classList.add('show');
+			for (i = 1; i <= 5; i++){
+				if (i != 3){
+					var id = "a_day_heading"+i
+					document.getElementById(id).classList.add('collapsed')
+				}
+			}
+		</script>
+	</div>
+</div>
+{% endfor %}

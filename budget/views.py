@@ -6,6 +6,7 @@ from django.template.defaulttags import register
 
 from collections import OrderedDict
 from datetime import date
+from datetime import timedelta
 
 from .base import *
 from .models import *
@@ -45,6 +46,7 @@ class BudgetView(generic.DetailView):
     model = Budget
     template_name = 'budget/budget.html'
     pk_url_kwarg = "Budget_id"
+    select_day = date.today()
 
     def get_context_data(self, **kwargs):
         budget = kwargs['object']
@@ -72,6 +74,13 @@ class BudgetView(generic.DetailView):
                 choices[c_name] += e.value
         context["CHOICES"] = choices
         context["Today"] = date.today()
+        select_day_list = [self.select_day]
+        day_range = 2
+        for i in range(1, day_range+1):
+            select_day_list.append(self.select_day-timedelta(days=i))
+            select_day_list.append(self.select_day+timedelta(days=i))
+        select_day_list.sort()
+        context["DAY_LIST"] = select_day_list 
         
         return context
     
@@ -177,6 +186,7 @@ class BudgetView(generic.DetailView):
         name = self.GET["name"] 
         value = int(self.GET["value"])
         date = self.GET["date"]
+        print(date)
         Bank_name = self.GET["Bank_name"]
         Category_name = self.GET["Category_name"]
 

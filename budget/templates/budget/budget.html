@@ -7,6 +7,7 @@
 		<!-- Bootstrap CSS -->
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
 		<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+		
 		<!-- w3c CSS -->
 		<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 		<!-- Optional JavaScript -->
@@ -14,9 +15,15 @@
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
 
 		{% load static %}
+		<!-- css -->
 		<link rel="stylesheet" type="text/css" href={% static "budget/css/budget.css"%}>
+		<link rel="stylesheet" type="text/css" href={% static "bootstrap-datepicker/dist/css/bootstrap-datepicker3.min.css"%}/>
+		<!-- js -->
+		<script src={% static "bootstrap-datepicker/js/bootstrap-datepicker.js" %}></script>
+		<script src={% static "bootstrap-datepicker/js/locales/bootstrap-datepicker.zh-TW.js"%}></script>
 		<title>{{ budget.name }}</title>
 		<meta charset='utf-8'>
 	</head>
@@ -47,17 +54,18 @@
 			<h2>支出</h2>
 			<ul class="nav nav-tabs" id="myTab" role="tablist">
 				<li class="nav-item">
-					<a class="nav-link active" id="category-tab" data-toggle="tab" href="#category" role="tab" aria-controls="category" aria-selected="true">依分類</a>
+					<a class="nav-link active" id="date-tab" data-toggle="tab" href="#date" role="tab" aria-controls="date" aria-selected="true">依日期</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" id="date-tab" data-toggle="tab" href="#date" role="tab" aria-controls="date" aria-selected="false">依日期</a>
+					<a class="nav-link" id="category-tab" data-toggle="tab" href="#category" role="tab" aria-controls="category" aria-selected="false">依分類</a>
 				</li>
 			</ul>
 				<div class="tab-content">
-					<div class="tab-pane active" id="category" role="tabpanel" aria-labelledby="category-tab">
-						{% include 'budget/expenses.html' %}
+					<div class="tab-pane active " id="date" role="tabpanel" aria-labelledby="date-tab">
+						{% include 'budget/calender.html' %}
 					</div>
-					<div class="tab-pane active" id="date" role="tabpanel" aria-labelledby="date-tab">
+					<div class="tab-pane " id="category" role="tabpanel" aria-labelledby="category-tab">
+						{% include 'budget/expenses.html' %}
 					</div>
 				</div>
 			</div>
