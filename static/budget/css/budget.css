@@ -34,8 +34,9 @@
 	font-family:'Glyphicons Halflings';
 	content:"\e114";
 	position: absolute;
-	right: 20px;
+	right:10px;
 }
 .panel-group .panel-heading a.collapsed:after {
 	content:"\e080";
 }
+

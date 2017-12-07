@@ -5,9 +5,15 @@
 			<h4 class="panel-title">
 				<a id ="a_day_heading{{forloop.counter}}" data-toggle="collapse" data-parent="#day_accordion" href="#day_collapse{{forloop.counter}}">
 					{{day}}
+					<span style="position:absolute;right:35px" id="day_total{{forloop.counter}}"></span>
 				</a>
 			</h4>
 		</div><!--/.panel-heading -->
+		<script>
+			$('.chevron_toggleable').on('click', function() {
+				    $(this).toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+			});
+		</script>
 		<div id="day_collapse{{forloop.counter}}" class="panel-collapse collapse">
 			<div class="panel-body">
 				<table class="table table-responsive">
@@ -22,17 +28,17 @@
 					</thead>	
 					<tbody>
 						{% for expense in Expenses %}
-						{% if expense.is_fulfill == True %}
-						{% if expense.date == day %}
-						<tr>
-							<td>{{ expense.get_category_display }}</td>
-							<td>{{ expense.name }}</td>
-							<td>{{ expense.value }}</td>
-							<td>{{ expense.bank }}</td>
-							<td></td>
-						</tr>
-						{% endif %}
-						{% endif %}
+							{% if expense.is_fulfill == True %}
+								{% if expense.date == day %}
+									<tr>
+										<td>{{ expense.get_category_display }}</td>
+										<td>{{ expense.name }}</td>
+										<td>{{ expense.value }}</td>
+										<td>{{ expense.bank }}</td>
+										<td></td>
+									</tr>
+								{% endif %}
+							{% endif %}
 						{% endfor %}
 						<form action="add_expense" method="get" >
 							<tr>
@@ -69,12 +75,21 @@
 			</div>
 		</div>
 		<script>
-			document.getElementById("day_collapse3").classList.add('show');
-			for (i = 1; i <= 5; i++){
-				if (i != 3){
-					var id = "a_day_heading"+i
-					document.getElementById(id).classList.add('collapsed')
-				}
+			var day_total = 0
+			{% for expense in Expenses %}
+				{% if expense.is_fulfill == True %}
+					{% if expense.date == day %}
+						day_total += {{expense.value}}
+					{%endif%}
+				{%endif%}
+			{%endfor%}
+			var id = {{forloop.counter}}
+			document.getElementById("day_total"+id).innerHTML = "$"+day_total
+			if (id != 3){
+				document.getElementById("a_day_heading"+id).classList.add('collapsed')
+			}
+			else{
+				document.getElementById("day_collapse"+id).classList.add('show')
 			}
 		</script>
 	</div>

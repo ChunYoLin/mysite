@@ -4,10 +4,8 @@
 		<div class="panel-heading" role="tab" id="heading{{forloop.counter}}">
 			<h4 class="panel-title">
 				<a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}">
-					<tr>
-						<td>{{c_name}}</td>
-						<td>{{value}}</td>
-					</tr>
+					{{c_name}}
+					<span style="position:absolute;right:35px;">${{value}}</span>
 				</a>
 			</h4>
 		</div><!--/.panel-heading -->
