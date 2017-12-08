@@ -4,8 +4,11 @@ import datetime
 months = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
 
 year = Year.objects.get(name=2017)
-budget = Budget.objects.get(name="十一月", year=year)
-print(model_base.objects)
+budget = Budget.objects.get(name="十二月", year=year)
+LC = LivingCost.objects.get(name="生活/娛樂費", budget=budget)
+LC.update()
+print(LC.remain)
+LC.save()
 #  print(LC[0].value)
 #  LC[0].save()
 #  LC = LivingCost.objects.get(budget=budget)
