@@ -1,6 +1,6 @@
-{% for day in DAY_LIST %}
 <div class="panel-group" id="day_accordion">
 	<div class="panel panel-primary">
+		{% for day in DAY_LIST %}
 		<div class="panel-heading" role="tab" id="day_heading{{forloop.counter}}">
 			<h4 class="panel-title">
 				<a id ="a_day_heading{{forloop.counter}}" data-toggle="collapse" data-parent="#day_accordion" href="#day_collapse{{forloop.counter}}">
@@ -9,11 +9,6 @@
 				</a>
 			</h4>
 		</div><!--/.panel-heading -->
-		<script>
-			$('.chevron_toggleable').on('click', function() {
-				    $(this).toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
-			});
-		</script>
 		<div id="day_collapse{{forloop.counter}}" class="panel-collapse collapse">
 			<div class="panel-body">
 				<table class="table table-responsive">
@@ -92,6 +87,6 @@
 				document.getElementById("day_collapse"+id).classList.add('show')
 			}
 		</script>
+		{% endfor %}
 	</div>
 </div>
-{% endfor %}
